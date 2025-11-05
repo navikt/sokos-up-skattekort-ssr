@@ -1,4 +1,4 @@
-# sokos-astro-template
+# sokos-up-skattekort-ssr
 
 Brukes som utgangspunkt for å opprette nye server-side mikrofrontends i Utbetalingsportalen.
 

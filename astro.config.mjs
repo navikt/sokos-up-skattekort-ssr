@@ -14,7 +14,7 @@ export default defineConfig({
       postcss: {
         plugins: [
           prefixer({
-            prefix: ".sokos-astro-template", // brukes for å unngå å lekke css ut av mikrofrontenden
+            prefix: ".sokos-up-skattekort-ssr", // brukes for å unngå å lekke css ut av mikrofrontenden
             ignoreFiles: [/module.css/],
           }),
         ],
