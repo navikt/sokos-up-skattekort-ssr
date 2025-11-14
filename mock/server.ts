@@ -1,15 +1,14 @@
-import { Hono } from "hono";
 import { serve } from "@hono/node-server";
+import { Hono } from "hono";
 import { cors } from "hono/cors";
-import tilleggsopplysning from "./data/skattekortMedTilleggsopplysning.json";
-import tabelltrekk from "./data/skattekortMedTabelltrekk.json";
-import frikort from "./data/skattekortUtenNavn.json";
 import ikkeSkattekort from "./data/ikkeSkattekort.json";
-import tomtSvar from "./data/tomtSvar.json";
+import tabelltrekk from "./data/skattekortMedTabelltrekk.json";
+import tilleggsopplysning from "./data/skattekortMedTilleggsopplysning.json";
+import frikort from "./data/skattekortUtenNavn.json";
 
 const api = new Hono();
 
-const mockResponses = new Map([
+const mockResponses = new Map<string, unknown>([
   ["01016902310", tilleggsopplysning],
   ["04014400295", tabelltrekk],
   ["01096000533", frikort],
@@ -19,7 +18,7 @@ const mockResponses = new Map([
 api.use(
   "/*",
   cors({
-    origin: ["http://localhost:4321", "http://localhost:4322"],
+    origin: ["http://localhost:4321"],
     credentials: true,
   }),
 );
@@ -29,7 +28,7 @@ api.post("/skattekort-api/api/v1/hent-skattekort", async (context) => {
     .json<{ fnr?: string }>()
     .catch(() => undefined);
   const fnr = body?.fnr ?? "";
-  const response = mockResponses.get(fnr) ?? tomtSvar;
+  const response = mockResponses.get(fnr) ?? [];
   return context.json(response);
 });
 
