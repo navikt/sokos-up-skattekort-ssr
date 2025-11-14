@@ -8,7 +8,11 @@ interface YearToggleProps {
 
 export default function YearToggle({ years, defaultYear }: YearToggleProps) {
   return (
-    <ToggleGroup defaultValue={String(defaultYear)} size="small">
+    <ToggleGroup
+      defaultValue={String(defaultYear)}
+      size="small"
+      onChange={() => {}}
+    >
       {years.map((year) => (
         <ToggleGroup.Item key={year} value={String(year)}>
           <div className={styles.skattekortsearch__toggleitems}>{year}</div>

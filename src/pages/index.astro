@@ -1,13 +1,13 @@
 ---
 import Layout from "@components/layout/Layout.astro";
+import commonStyles from "@components/skattekort/commonStyles.module.css";
 import SkattekortForm from "@components/skattekort/SkattekortForm.astro";
 import Skattekortvisning from "@components/skattekort/Skattekortvisning";
-import { Alert, BodyLong, Heading } from "@navikt/ds-react";
+import { Alert, Heading } from "@navikt/ds-react";
+import type { SkattekortData } from "@schema/SkattekortSchema";
+import { getYearOptions } from "@utils/year";
 import { actions, isInputError } from "astro:actions";
 import styles from "./_index.module.css";
-import commonStyles from "@components/skattekort/commonStyles.module.css";
-import { getYearOptions } from "@utils/year";
-import type { SkattekortData } from "@schema/SkattekortSchema";
 
 const yearOptions = getYearOptions();
 const actionResult = Astro.getActionResult(actions.skattekort.search);
