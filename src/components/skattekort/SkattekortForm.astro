@@ -1,0 +1,107 @@
+---
+import { actions } from "astro:actions";
+import { Button, Heading, HelpText, TextField } from "@navikt/ds-react";
+import YearToggle from "./YearToggle";
+import styles from "@components/skattekort/SkattekortSearch.module.css";
+import commonStyles from "@components/skattekort/commonStyles.module.css";
+
+export interface Props {
+  defaultFnr: string;
+  defaultYear: number;
+  yearOptions: number[];
+  fnrError?: string[];
+  yearError?: string[];
+}
+const { defaultFnr, defaultYear, yearOptions, fnrError, yearError } =
+  Astro.props as Props;
+---
+
+<form
+  method="POST"
+  action={actions.skattekort.search}
+  class={styles.skattekortsearch}
+  id="skattekort-form"
+>
+  <Heading level="2" size="medium"> Søk </Heading>
+
+  <TextField
+    label="Gjelder ID"
+    name="fnr"
+    defaultValue={defaultFnr}
+    autoComplete="off"
+    autoFocus
+    inputMode="numeric"
+    pattern="[0-9 .]*"
+    error={fnrError?.join(" ")}
+    description="Fyll inn 11 siffer. Du kan bruke mellomrom eller punktum for lesbarhet."
+  />
+
+  <div class={styles.skattekortsearch__help}>
+    <HelpText
+      title="Informasjon om Skattekort"
+      placement="left-start"
+      strategy="fixed"
+    >
+      <strong>Informasjon om Skattekort:</strong>
+      <br />
+      Skattekort viser opplysningene slik de er mottatt fra Skatteetaten. For detaljert
+      bruk i beregning må menypunktet "Skatt og trekk" sammen med "eSkattekort -
+      Søk" i Økonomiportalen benyttes.
+    </HelpText>
+  </div>
+
+  <div class={commonStyles.column}>
+    <div class={commonStyles.bold}>Gjelder år</div>
+    <input
+      type="hidden"
+      name="year"
+      value={String(defaultYear)}
+      id="year-input"
+    />
+    {yearError && <div class="navds-error-message">{yearError.join(" ")}</div>}
+    <YearToggle
+      years={yearOptions}
+      defaultYear={defaultYear}
+      client:only="react"
+    />
+  </div>
+
+  <Button type="submit">Søk</Button>
+</form>
+
+<script>
+  function initYearToggle() {
+    const form = document.getElementById(
+      "skattekort-form"
+    ) as HTMLFormElement | null;
+    const yearInput = document.getElementById(
+      "year-input"
+    ) as HTMLInputElement | null;
+    const fnrInput = form?.querySelector(
+      'input[name="fnr"]'
+    ) as HTMLInputElement | null;
+
+    if (!form || !yearInput || !fnrInput) return;
+
+    form.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement;
+      const toggleButton = target.closest('button[role="radio"]');
+
+      if (toggleButton) {
+        const newYear = toggleButton.getAttribute("value");
+        if (newYear && yearInput) {
+          yearInput.value = newYear;
+
+          const fnrValue = fnrInput.value.replace(/[\s.]/g, "");
+          if (fnrValue.length === 11 && /^[0-9]{11}$/.test(fnrValue)) {
+            form.requestSubmit();
+          }
+        }
+      }
+    });
+  }
+
+  initYearToggle();
+
+  document.addEventListener("astro:page-load", initYearToggle);
+</script>
