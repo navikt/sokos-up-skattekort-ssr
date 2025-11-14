@@ -34,6 +34,8 @@ spec:
     inbound:
       rules:
         - application: sokos-utbetalingsportalen
+          namespace: okonomi
+          cluster: dev:gcp
   resources:
     limits:
       memory: 1024Mi
