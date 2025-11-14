@@ -2,8 +2,8 @@
 import { actions } from "astro:actions";
 import { Button, Heading, HelpText, TextField } from "@navikt/ds-react";
 import YearToggle from "./YearToggle";
-import styles from "@components/skattekort/SkattekortSearch.module.css";
-import commonStyles from "@components/skattekort/commonStyles.module.css";
+import styles from "@components/skattekort/search.module.css";
+import common from "@components/skattekort/common.module.css";
 
 export interface Props {
   defaultFnr: string;
@@ -19,7 +19,7 @@ const { defaultFnr, defaultYear, yearOptions, fnrError, yearError } =
 <form
   method="POST"
   action={actions.skattekort.search}
-  class={styles.skattekortsearch}
+  class={styles.search}
   id="skattekort-form"
 >
   <Heading level="2" size="medium"> Søk </Heading>
@@ -36,11 +36,12 @@ const { defaultFnr, defaultYear, yearOptions, fnrError, yearError } =
     description="Fyll inn 11 siffer. Du kan bruke mellomrom eller punktum for lesbarhet."
   />
 
-  <div class={styles.skattekortsearch__help}>
+  <div class={styles.search__help}>
     <HelpText
       title="Informasjon om Skattekort"
       placement="left-start"
       strategy="fixed"
+      client:only="react"
     >
       <strong>Informasjon om Skattekort:</strong>
       <br />
@@ -50,8 +51,8 @@ const { defaultFnr, defaultYear, yearOptions, fnrError, yearError } =
     </HelpText>
   </div>
 
-  <div class={commonStyles.column}>
-    <div class={commonStyles.bold}>Gjelder år</div>
+  <div class={common.column}>
+    <div class={common.bold}>Gjelder år</div>
     <input
       type="hidden"
       name="year"

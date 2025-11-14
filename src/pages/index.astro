@@ -1,13 +1,13 @@
 ---
 import Layout from "@components/layout/Layout.astro";
-import commonStyles from "@components/skattekort/commonStyles.module.css";
-import SkattekortForm from "@components/skattekort/SkattekortForm.astro";
-import Skattekortvisning from "@components/skattekort/Skattekortvisning";
+import common from "@components/skattekort/common.module.css";
 import { Alert, Heading } from "@navikt/ds-react";
 import type { SkattekortData } from "@schema/SkattekortSchema";
 import { getYearOptions } from "@utils/year";
 import { actions, isInputError } from "astro:actions";
 import styles from "./_index.module.css";
+import Form from "../components/skattekort/form.astro";
+import Result from "../components/skattekort/result.astro";
 
 const yearOptions = getYearOptions();
 const actionResult = Astro.getActionResult(actions.skattekort.search);
@@ -40,7 +40,7 @@ const showSkattekort = Boolean(actionResult) && hasArbeidsgiver;
     </div>
 
     <div class={styles.formWrapper}>
-      <SkattekortForm
+      <Form
         defaultFnr={query?.fnr ?? ""}
         defaultYear={query?.year ?? defaultYear}
         yearOptions={yearOptions}
@@ -61,7 +61,7 @@ const showSkattekort = Boolean(actionResult) && hasArbeidsgiver;
       {
         showNoDataAlert && (
           <Alert variant="warning">
-            <div class={commonStyles.bold}>Ingen skattekort funnet</div>
+            <div class={common.bold}>Ingen skattekort funnet</div>
           </Alert>
         )
       }
@@ -69,10 +69,10 @@ const showSkattekort = Boolean(actionResult) && hasArbeidsgiver;
       {
         showNoSkattekort && (
           <>
-            <hr class={commonStyles.separator} />
+            <hr class={common.separator} />
             <div class={styles.resultName}>{resultName}</div>
             <Alert variant="warning">
-              <div class={commonStyles.bold}>Ingen skattekort funnet</div>
+              <div class={common.bold}>Ingen skattekort funnet</div>
               <div>
                 Vi fant ingen opplysninger om skattekort på dette
                 fødselsnummeret.
@@ -85,11 +85,11 @@ const showSkattekort = Boolean(actionResult) && hasArbeidsgiver;
       {
         showSkattekort && (
           <>
-            <hr class={commonStyles.separator} />
+            <hr class={common.separator} />
             <div
               class={styles.resultName}
             >{`Søkeresultat for ${resultName}`}</div>
-            <Skattekortvisning data={payload!} />
+            <Result data={payload!} />
           </>
         )
       }

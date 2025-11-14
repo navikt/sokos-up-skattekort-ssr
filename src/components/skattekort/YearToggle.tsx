@@ -1,5 +1,5 @@
 import { ToggleGroup } from "@navikt/ds-react";
-import styles from "./SkattekortSearch.module.css";
+import styles from "./search.module.css";
 
 interface YearToggleProps {
   years: number[];
@@ -14,13 +14,13 @@ export default function YearToggle({ years, defaultYear }: YearToggleProps) {
       'input[name="fnr"]',
     ) as HTMLInputElement;
 
-    if (yearInput && form) {
-      yearInput.value = value;
+    if (!yearInput || !form) return;
 
-      const fnrValue = fnrInput?.value.replace(/[\s.]/g, "");
-      if (fnrValue && fnrValue.length === 11 && /^[0-9]{11}$/.test(fnrValue)) {
-        form.requestSubmit();
-      }
+    yearInput.value = value;
+
+    const fnrValue = fnrInput?.value.replace(/[\s.]/g, "");
+    if (fnrValue?.length === 11 && /^[0-9]{11}$/.test(fnrValue)) {
+      form.requestSubmit();
     }
   };
 
@@ -32,7 +32,7 @@ export default function YearToggle({ years, defaultYear }: YearToggleProps) {
     >
       {years.map((year) => (
         <ToggleGroup.Item key={year} value={String(year)}>
-          <div className={styles.skattekortsearch__toggleitems}>{year}</div>
+          <div className={styles.search__toggleitems}>{year}</div>
         </ToggleGroup.Item>
       ))}
     </ToggleGroup>

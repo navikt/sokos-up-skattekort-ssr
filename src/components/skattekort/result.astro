@@ -1,0 +1,63 @@
+---
+import type { SkattekortData } from "@schema/SkattekortSchema";
+import Forskuddstrekk from "./forskuddstrekk.astro";
+import { TilleggsopplysningTekster } from "./TilleggsopplysningTekster";
+import { formatIdentifikator } from "./formatters";
+import styles from "./result.module.css";
+import common from "./common.module.css";
+
+export interface Props {
+  data: SkattekortData;
+}
+
+const { data } = Astro.props;
+
+const arbeidsgiver = data[0]?.arbeidsgiver?.[0];
+const arbeidstaker = arbeidsgiver?.arbeidstaker?.[0];
+const skattekort = arbeidstaker?.skattekort;
+const forskuddstrekkListe = skattekort?.forskuddstrekk ?? [];
+
+const utstedtDato = skattekort?.utstedtDato
+  ? `Utstedt dato: ${skattekort.utstedtDato}`
+  : "Ingen skattekort funnet";
+
+const tilleggsopplysning = arbeidstaker?.tilleggsopplysning?.[0];
+const tilleggsopplysningTekst = tilleggsopplysning
+  ? (TilleggsopplysningTekster.get(tilleggsopplysning) ?? tilleggsopplysning)
+  : undefined;
+---
+
+<div class={styles.result}>
+  <div class={styles.result__title}>
+    Skattekort {arbeidstaker?.inntektsaar}
+  </div>
+  <div>{utstedtDato}</div>
+
+  <hr class={common.separator} />
+
+  <div class={common.bold}>
+    Arbeidstaker: {
+      arbeidstaker &&
+        formatIdentifikator(arbeidstaker.arbeidstakeridentifikator)
+    }
+  </div>
+
+  {
+    tilleggsopplysningTekst && (
+      <>
+        <div class={common.separator} />
+        <div class={common.bold}>
+          Tilleggsopplysning: {tilleggsopplysningTekst}
+        </div>
+      </>
+    )
+  }
+
+  <div class={styles.result__table}>
+    {
+      forskuddstrekkListe.map((forskuddstrekk) => (
+        <Forskuddstrekk forskuddstrekk={forskuddstrekk} />
+      ))
+    }
+  </div>
+</div>

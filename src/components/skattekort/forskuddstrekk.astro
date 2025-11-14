@@ -1,0 +1,37 @@
+---
+import type { Forskuddstrekk } from "@schema/SkattekortSchema";
+import { TrekkodeTekster } from "./TrekkodeTekster";
+import { formatProsentsats, formatBeløp, formatNumber } from "./formatters";
+import styles from "./forskuddstrekk.module.css";
+
+export interface Props {
+  forskuddstrekk: Forskuddstrekk;
+}
+
+const { forskuddstrekk } = Astro.props;
+
+const trekkodeBeskrivelse = TrekkodeTekster.get(forskuddstrekk.trekkode) ?? forskuddstrekk.trekkode;
+const prosentsats = formatProsentsats(forskuddstrekk.prosentsats);
+const beløpEllerProsent = prosentsats
+  ? `Prosentsats: ${prosentsats}`
+  : `Frikortbeløp: ${formatBeløp(forskuddstrekk.frikortbeloep)}`;
+
+const isTrekktabell = forskuddstrekk.type === "Trekktabell";
+---
+
+<div class={styles.forskuddstrekk__row}>
+  <div class={styles.forskuddstrekk__bold}>{trekkodeBeskrivelse}</div>
+  <div class={styles.forskuddstrekk__normal}>{beløpEllerProsent}</div>
+  {
+    isTrekktabell && (
+      <>
+        <div class={styles.forskuddstrekk__bold}>
+          Tabell {forskuddstrekk.tabellnummer ?? "-"}
+        </div>
+        <div class={styles.forskuddstrekk__normal}>
+          Antall måneder for trekk: {formatNumber(forskuddstrekk.antallMaanederForTrekk)}
+        </div>
+      </>
+    )
+  }
+</div>
