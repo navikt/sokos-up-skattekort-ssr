@@ -47,3 +47,5 @@ spec:
   env:
     - name: SOKOS_SKATTEKORT_PERSON_API
       value: https://sokos-skattekort-person.dev-fss-pub.nais.io
+    - name: SOKOS_SKATTEKORT_PERSON_API_AUDIENCE
+      value: "api://dev-fss.okonomi.sokos-skattekort-person/.default"
