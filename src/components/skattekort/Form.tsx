@@ -57,16 +57,19 @@ export default function Form({
     setLoading(true);
 
     try {
-      const response = await fetch("/api/skattekort/hent-skattekort", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.BASE_URL}api/skattekort/hent-skattekort`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fnr,
+            inntektsaar: parseInt(inntektsaar),
+          }),
         },
-        body: JSON.stringify({
-          fnr,
-          inntektsaar: parseInt(inntektsaar),
-        }),
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
