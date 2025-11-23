@@ -5,6 +5,7 @@
   "scripts": {
     "astro": "astro",
     "dev": "astro dev",
+    "dev:mock": "concurrently \"pnpm run mock\" \"pnpm run dev\"",
     "build": "astro check && astro build",
     "mock": "tsx mock/server.ts",
     "preview": "astro preview",
@@ -32,6 +33,7 @@
     "@types/node": "24.10.1",
     "@types/react": "19.2.6",
     "@types/react-dom": "19.2.3",
+    "concurrently": "^9.2.1",
     "hono": "4.10.6",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",

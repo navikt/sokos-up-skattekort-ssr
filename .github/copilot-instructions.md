@@ -46,7 +46,7 @@ This is an Astro SSR microfrontend for the NAV Utbetalingsportalen (Payment Port
 ### File Naming
 
 - Astro components: PascalCase (e.g., `Layout.astro`)
-- CSS Modules: `componentName.module.css`
+- CSS Modules: `ComponentName.module.css` (PascalCase for component modules) or `_pageName.module.css` (underscore prefix for page modules)
 - TypeScript files: camelCase for utilities, PascalCase for types
 - Use `.ts` for utility files, `.astro` for components
 
@@ -70,6 +70,16 @@ This is an Astro SSR microfrontend for the NAV Utbetalingsportalen (Payment Port
 - Use `@navikt/oasis` for Azure token validation
 - Token available in `context.locals.token` after middleware
 - Use Bearer token in Authorization header for backend requests
+
+### Backend API Communication
+
+**Important**: This SSR microfrontend is embedded in the Utbetalingsportalen container app, which handles proxy routing to backend services.
+
+- **Local development**: Use full URL to mock server (`http://localhost:3000`)
+- **Deployed environment**: Use relative proxy paths (e.g., `/skattekort-api/api/v1/...`)
+- The container app proxies requests through `SOKOS_SKATTEKORT_PERSON_API_PROXY: "/skattekort-api"` to the actual backend
+- Do NOT use environment variables for backend URLs in deployed environments - rely on the container app's proxy configuration
+- This approach is identical to client-side microfrontends, where the browser makes requests through the same proxy
 
 ### Type Safety
 
@@ -121,6 +131,7 @@ This is an Astro SSR microfrontend for the NAV Utbetalingsportalen (Payment Port
 ## Commands
 
 - `pnpm dev` - Start development server
+- `pnpm dev:mock` - Start both mock server and dev server concurrently
 - `pnpm build` - Type check and build for production
 - `pnpm mock` - Run mock server for local development
 - `pnpm preview` - Preview production build
@@ -128,50 +139,293 @@ This is an Astro SSR microfrontend for the NAV Utbetalingsportalen (Payment Port
 
 ## Common Patterns
 
-### Fetching Data with Auth
+### Form Handling
+
+**Use API Routes (not Astro Actions) for forms** because:
+
+- Direct access to `context.locals.token` from middleware
+- Full control over request/response handling for backend proxying
+- Consistent with existing `/api/*` structure
+- Better for authenticated backend requests
+
+### API Route Pattern
 
 ```typescript
-const fetchData = async (oboToken: string, url: string) => {
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${oboToken}`,
-    },
-  });
+// src/pages/api/resource/action.ts
+import type { APIRoute } from "astro";
+import { RequestSchema } from "@schema/RequestSchema";
+import { fetchResource } from "@utils/resourceApi";
+import { ApiError, HttpStatusCodeError } from "../../../types/errors";
+import logger from "@utils/logger";
 
-  if (!response.ok) {
-    throw new Error(`Http error with status: ${response.status}`);
+export const POST: APIRoute = async ({ request, locals }) => {
+  try {
+    const token = locals.token;
+    if (!token) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const body = await request.json();
+    const validated = RequestSchema.parse(body);
+    const data = await fetchResource(validated, token);
+
+    return new Response(JSON.stringify(data), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    logger.error({ error }, "Error in API route");
+
+    if (error instanceof HttpStatusCodeError) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: error.statusCode,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
-
-  return await response.json();
 };
 ```
 
-### Astro Page with React components
+### Backend API Utility Pattern
 
 ```typescript
----
-import AppSwitcher from "@components/appswitcher/AppSwitcher";
-import AppSwitcherSkeleton from "@components/appswitcher/AppSwitcherSkeleton";
-import GuidePanel from "@components/welcomepanel/WelcomePanel";
-import Layout from "@layouts/Layout.astro";
-import styles from "./pageName.module.css";
+// src/utils/api.ts
+import type { Response } from "../types/Response";
+import type { Request } from "../types/Request";
+import { ApiError, HttpStatusCodeError } from "../types/errors";
+import logger from "@utils/logger";
+import { isLocal } from "@utils/environment";
 
-// Server side code
-const userData = Astro.locals.userData;
+// Local development uses mock server, deployed uses proxy path from container app
+const BASE_API_URL = isLocal ? "http://localhost:3000" : "/skattekort-api";
+("https://utbetalingsportalen.intern.dev.nav.no/sokos-up-skattekort");
+
+export async function fetchSkattekort(
+  query: Request,
+  token: string,
+): Promise<Response> {
+  const url = `${BACKEND_BASE_URL}/api/v1/hent-skattekort`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        Pragma: "no-cache",
+        "Cache-Control": "no-cache",
+      },
+      body: JSON.stringify(query),
+    });
+
+    if (response.status === 400) {
+      throw new HttpStatusCodeError(400, "Ugyldig forespørsel");
+    }
+
+    if (response.status === 401 || response.status === 403) {
+      throw new HttpStatusCodeError(response.status, "Ikke tilgang");
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error(
+        {
+          status: response.status,
+          statusText: response.statusText,
+          errorText,
+          url,
+        },
+        "Backend response not OK",
+      );
+      throw new ApiError(
+        `Issues with connection to backend: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    logger.error(
+      {
+        error,
+        message: error instanceof Error ? error.message : "Unknown error",
+        url,
+      },
+      "Failed to fetch skattekort",
+    );
+    throw error;
+  }
+}
+```
+
+### React Form Component Pattern
+
+```typescript
+// src/components/skattekort/Form.tsx
+import { Alert, Button, Heading, Loader, TextField, ToggleGroup } from "@navikt/ds-react";
+import { useState } from "react";
+import type { Response } from "../../types/Response";
+import styles from "./Form.module.css";
+
+export default function Form({ currentYear = new Date().getFullYear() }) {
+  const [fnr, setFnr] = useState("");
+  const [inntektsaar, setInntektsaar] = useState(currentYear.toString());
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<Response | null>(null);
+  const [fnrError, setFnrError] = useState<string | null>(null);
+
+  const validateFnr = (value: string): string | null => {
+    if (!value) return "Fødselsnummer er påkrevd";
+    if (value.length !== 11) return "Fødselsnummer må være 11 siffer";
+    if (!/^\d{11}$/.test(value)) return "Fødselsnummer må inneholde kun tall";
+    return null;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setData(null);
+
+    const validationError = validateFnr(fnr);
+    if (validationError) {
+      setFnrError(validationError);
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/skattekort/hent-skattekort", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fnr, inntektsaar: parseInt(inntektsaar) }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Noe gikk galt ved henting av skattekort");
+      }
+
+      const result = await response.json();
+      setData(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Noe gikk galt");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <Heading level="2" size="medium" spacing>Søk etter skattekort</Heading>
+
+      <TextField
+        label="Fødselsnummer (11 siffer)"
+        value={fnr}
+        onChange={(e) => setFnr(e.target.value)}
+        error={fnrError}
+        maxLength={11}
+      />
+
+      <ToggleGroup
+        label="Velg inntektsår"
+        value={inntektsaar}
+        onChange={(value) => setInntektsaar(value)}
+      >
+        <ToggleGroup.Item value={(currentYear - 1).toString()}>
+          {currentYear - 1}
+        </ToggleGroup.Item>
+        <ToggleGroup.Item value={currentYear.toString()}>
+          {currentYear}
+        </ToggleGroup.Item>
+      </ToggleGroup>
+
+      <Button type="submit" disabled={loading}>
+        {loading ? <Loader size="small" /> : "Søk"}
+      </Button>
+
+      {error && <Alert variant="error">{error}</Alert>}
+    </form>
+  );
+}
+```
+
+### Astro Page with React Components
+
+```astro
+---
+import Layout from "@components/layout/Layout.astro";
+import ResourceForm from "@components/resource/ResourceForm";
+import { Heading, BodyLong } from "@navikt/ds-react";
+import styles from "./_pageName.module.css";
+
+// Server-side code here
+const token = Astro.locals.token;
 ---
 
-<Layout title="home">
-  <div class={styles.home}>
-    <div class={styles.homeContent}>
-      <GuidePanel name={userData.name} />
-      <AppSwitcher server:defer adGroups={userData.groups} client:only="react">
-        <AppSwitcherSkeleton slot="fallback" />
-      </AppSwitcher>
-    </div>
+<Layout>
+  <div class={styles.page}>
+    <Heading level="1" size="large">Title</Heading>
+    <BodyLong spacing>Description</BodyLong>
+    <ResourceForm client:load />
   </div>
 </Layout>
+```
+
+### Mock Server Pattern
+
+```typescript
+// mock/server.ts
+import { Hono } from "hono";
+import { serve } from "@hono/node-server";
+import { cors } from "hono/cors";
+import mockData2024 from "./data/skattekort-2024.json";
+import mockData2025 from "./data/skattekort-2025.json";
+
+const api = new Hono();
+
+api.use(
+  "/*",
+  cors({
+    origin: "http://localhost:4321",
+    credentials: true,
+  }),
+);
+
+api.post("/api/v1/hent-skattekort", async (c) => {
+  const body = await c.req.json();
+  const { fnr, inntektsaar } = body;
+
+  console.log("Received request:", { fnr, inntektsaar });
+
+  if (!fnr || fnr.length !== 11) {
+    return c.json({ error: "Ugyldig fødselsnummer" }, 400);
+  }
+
+  const year = Number(inntektsaar);
+  if (year === 2025) return c.json(mockData2025);
+  if (year === 2024) return c.json(mockData2024);
+
+  return c.json({ error: "Fant ikke skattekort for oppgitt år" }, 404);
+});
+
+serve(
+  {
+    fetch: api.fetch,
+    port: 3000,
+  },
+  (info) => {
+    console.log(`Mock server running on http://localhost:${info.port}`);
+  },
+);
 ```
 
 ## Code Quality

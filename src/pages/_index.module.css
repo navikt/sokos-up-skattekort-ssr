@@ -1,10 +1,9 @@
-.header {
-  padding-bottom: 1.5rem;
-  padding-top: 1.5rem;
-  text-align: center;
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
-.content {
-  background-color: var(--a-surface-alt-1-subtle);
-  padding: 2.5rem;
+.header {
+  margin-bottom: 2rem;
 }

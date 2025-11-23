@@ -1,0 +1,18 @@
+{
+  "arbeidstaker": {
+    "fnr": "12345678901",
+    "navn": "Ola Nordmann"
+  },
+  "inntektsaar": 2025,
+  "arbeidsgiver": {
+    "organisasjonsnummer": "123456789",
+    "organisasjonsnavn": "NAV"
+  },
+  "skattekort": {
+    "prosentsats": 35.5,
+    "tabellnummer": "7100",
+    "trekkgrunn": "Ordinært skattekort",
+    "frikort": false
+  },
+  "tilleggsopplysninger": "Ingen tilleggsopplysninger"
+}

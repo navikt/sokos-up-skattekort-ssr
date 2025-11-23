@@ -7,6 +7,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const token = getToken(context.request.headers);
 
   if (isLocal) {
+    context.locals.token = "mock-token";
     return next();
   }
 
