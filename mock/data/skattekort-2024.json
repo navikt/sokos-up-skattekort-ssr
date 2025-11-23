@@ -1,18 +1,30 @@
-{
-  "arbeidstaker": {
-    "fnr": "12345678901",
-    "navn": "Ola Nordmann"
-  },
-  "inntektsaar": 2024,
-  "arbeidsgiver": {
-    "organisasjonsnummer": "123456789",
-    "organisasjonsnavn": "NAV"
-  },
-  "skattekort": {
-    "prosentsats": 34.2,
-    "tabellnummer": "7100",
-    "trekkgrunn": "Ordinært skattekort",
-    "frikort": false
-  },
-  "tilleggsopplysninger": "Ingen tilleggsopplysninger"
-}
+[
+  {
+    "navn": "Ola Nordmann",
+    "arbeidsgiver": [
+      {
+        "arbeidsgiveridentifikator": {
+          "organisasjonsnummer": "123456789"
+        },
+        "arbeidstaker": [
+          {
+            "inntektsaar": 2024,
+            "arbeidstakeridentifikator": "12345678901",
+            "resultatPaaForespoersel": "skattekortopplysningerOK",
+            "skattekort": {
+              "utstedtDato": "2023-12-15",
+              "skattekortidentifikator": 124,
+              "forskuddstrekk": [
+                {
+                  "type": "Trekkprosent",
+                  "trekkode": "loennFraHovedarbeidsgiver",
+                  "prosentsats": 34
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
