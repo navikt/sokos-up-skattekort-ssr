@@ -5,6 +5,7 @@ import prefixer from "postcss-prefix-selector";
 
 // https://astro.build/config
 export default defineConfig({
+  base: "/skattekort-ssr",
   build: {
     inlineStylesheets: "always",
   },
