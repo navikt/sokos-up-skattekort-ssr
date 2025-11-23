@@ -34,6 +34,9 @@ spec:
     inbound:
       rules:
         - application: sokos-utbetalingsportalen
+    outbound:
+      external:
+        - host: sokos-skattekort-person.dev-fss-pub.nais.io
   webproxy: true
   resources:
     limits:
@@ -43,4 +46,4 @@ spec:
       memory: 128Mi
   env:
     - name: SOKOS_SKATTEKORT_PERSON_API
-      value: "https://sokos-skattekort-person.dev-fss-pub.nais.io"
+      value: https://sokos-skattekort-person.dev-fss-pub.nais.io
