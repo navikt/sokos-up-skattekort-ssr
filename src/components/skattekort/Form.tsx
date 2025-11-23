@@ -58,7 +58,7 @@ export default function Form({
 
     try {
       const response = await fetch(
-        `${import.meta.env.BASE_URL}api/skattekort/hent-skattekort`,
+        `${import.meta.env.BASE_URL}/api/skattekort/hent-skattekort`,
         {
           method: "POST",
           headers: {
