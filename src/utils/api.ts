@@ -4,13 +4,19 @@ import { ApiError, HttpStatusCodeError } from "../types/errors";
 import logger from "@utils/logger";
 import { isLocal } from "@utils/environment";
 
-// Local development uses mock server, deployed uses proxy path from container app
-const BASE_API_URL = isLocal ? "http://localhost:3000" : "/skattekort-api";
+const BASE_API_URL = isLocal
+  ? "http://localhost:3000"
+  : process.env.SOKOS_SKATTEKORT_PERSON_API;
 
 export async function fetchSkattekort(
   query: Request,
   token: string,
 ): Promise<Response> {
+  if (!BASE_API_URL) {
+    throw new Error(
+      "Backend URL is not configured (SOKOS_SKATTEKORT_PERSON_API missing)",
+    );
+  }
   const url = `${BASE_API_URL}/api/v1/hent-skattekort`;
 
   try {
