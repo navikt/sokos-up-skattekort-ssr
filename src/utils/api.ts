@@ -40,16 +40,17 @@ export async function fetchSkattekort(
       body: JSON.stringify(payload),
     });
 
-    if (response.status === 400) {
-      throw new HttpStatusCodeError(400, "Ugyldig forespørsel");
-    }
-
-    if (response.status === 401 || response.status === 403) {
-      throw new HttpStatusCodeError(response.status, "Ikke tilgang");
-    }
-
     if (!response.ok) {
       const errorText = await response.text();
+      let errorMessage = "";
+
+      try {
+        const json = JSON.parse(errorText);
+        errorMessage = json.message || json.error || "";
+      } catch {
+        if (errorText.length < 200) errorMessage = errorText;
+      }
+
       logger.error(
         {
           status: response.status,
@@ -59,8 +60,25 @@ export async function fetchSkattekort(
         },
         "Backend response not OK",
       );
+
+      if (response.status === 400) {
+        throw new HttpStatusCodeError(
+          400,
+          errorMessage || "Ugyldig forespørsel",
+        );
+      }
+
+      if (response.status === 401 || response.status === 403) {
+        throw new HttpStatusCodeError(response.status, "Ikke tilgang");
+      }
+
+      if (response.status === 404) {
+        throw new HttpStatusCodeError(404, errorMessage || "Fant ikke ressurs");
+      }
+
       throw new ApiError(
-        `Issues with connection to backend: ${response.status} ${response.statusText}`,
+        errorMessage ||
+          `Issues with connection to backend: ${response.status} ${response.statusText}`,
       );
     }
 
