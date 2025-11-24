@@ -26,6 +26,8 @@ export async function fetchSkattekort(
   }
   const url = `${BASE_API_URL}/api/v1/hent-skattekort`;
 
+  logger.info(`Fetching skattekort from: ${url}`);
+
   try {
     const response = await fetch(url, {
       method: "POST",

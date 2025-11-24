@@ -33,6 +33,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
         );
       }
 
+      logger.info(
+        `Requesting OBO token for audience: ${audience} (useNewApi=${validated.useNewApi})`,
+      );
+
       const oboResult = await requestOboToken(token, audience);
 
       if (!oboResult.ok) {
