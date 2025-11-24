@@ -37,7 +37,7 @@ spec:
     outbound:
       external:
         - host: sokos-skattekort-person.dev-fss-pub.nais.io
-        - host: sokos-skattekort.intern.dev.nav.no
+        - host: sokos-skattekort.dev-fss-pub.nais.io
   webproxy: true
   resources:
     limits:
@@ -51,6 +51,6 @@ spec:
     - name: SOKOS_SKATTEKORT_PERSON_API_AUDIENCE
       value: "api://dev-fss.okonomi.sokos-skattekort-person/.default"
     - name: SOKOS_SKATTEKORT_API
-      value: https://sokos-skattekort.intern.dev.nav.no
+      value: https://sokos-skattekort.dev-fss-pub.nais.io
     - name: SOKOS_SKATTEKORT_API_AUDIENCE
       value: "api://dev-fss.okonomi.sokos-skattekort/.default"
