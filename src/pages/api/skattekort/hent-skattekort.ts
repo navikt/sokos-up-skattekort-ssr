@@ -3,7 +3,7 @@ import { RequestSchema } from "@schema/SkattekortSchema";
 import { fetchSkattekort } from "@utils/api";
 import { ApiError, HttpStatusCodeError } from "../../../types/errors";
 import logger from "@utils/logger";
-import { requestOboToken } from "@navikt/oasis";
+import { getOboToken } from "@utils/token";
 import { isLocal } from "@utils/environment";
 
 export const POST: APIRoute = async ({ request, locals }) => {
@@ -37,22 +37,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
         `Requesting OBO token for audience: ${audience} (useNewApi=${validated.useNewApi})`,
       );
 
-      const oboResult = await requestOboToken(token, audience);
-
-      if (!oboResult.ok) {
-        logger.error(
-          {
-            error: oboResult.error,
-          },
-          "Failed to get OBO token for backend",
-        );
+      try {
+        backendToken = await getOboToken(token, audience);
+      } catch (e) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
           status: 401,
           headers: { "Content-Type": "application/json" },
         });
       }
-
-      backendToken = oboResult.token;
     }
 
     const data = await fetchSkattekort(validated, backendToken);
