@@ -16,7 +16,7 @@ export async function fetchSkattekort(
   query: Request,
   token: string,
 ): Promise<Response> {
-  const useNewApi = query.useNewApi ?? false;
+  const { useNewApi, ...payload } = query;
   const BASE_API_URL = useNewApi ? NEW_API_URL : OLD_API_URL;
 
   if (!BASE_API_URL) {
@@ -37,7 +37,7 @@ export async function fetchSkattekort(
         Pragma: "no-cache",
         "Cache-Control": "no-cache",
       },
-      body: JSON.stringify(query),
+      body: JSON.stringify(payload),
     });
 
     if (response.status === 400) {
