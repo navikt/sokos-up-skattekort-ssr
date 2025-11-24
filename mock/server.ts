@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import skattekort2024 from "./data/skattekort-2024.json";
 import skattekort2025 from "./data/skattekort-2025.json";
+import skattekortNewApi from "./data/skattekort-new-api.json";
 
 const api = new Hono();
 
@@ -26,6 +27,10 @@ api.post("/api/v1/hent-skattekort", async (c) => {
 
   if (!fnr || fnr.length !== 11) {
     return c.json({ error: "Ugyldig fødselsnummer" }, 400);
+  }
+
+  if (fnr === "22222222222") {
+    return c.json(skattekortNewApi);
   }
 
   const year = Number(inntektsaar);

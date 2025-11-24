@@ -3,4 +3,7 @@ import type {
   SkattekortPersonDto,
 } from "./schema/SkattekortSchema";
 
-export type Response = SkattekortData | SkattekortPersonDto;
+export type Response =
+  | SkattekortData
+  | SkattekortPersonDto
+  | SkattekortPersonDto[];
