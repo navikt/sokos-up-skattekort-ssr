@@ -1,6 +1,7 @@
 import {
   Alert,
   Button,
+  Checkbox,
   Heading,
   Loader,
   TextField,
@@ -19,6 +20,7 @@ export default function Form({
 }: SkattekortFormProps) {
   const [fnr, setFnr] = useState("");
   const [inntektsaar, setInntektsaar] = useState(currentYear.toString());
+  const [useNewApi, setUseNewApi] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<Response | null>(null);
@@ -67,6 +69,7 @@ export default function Form({
           body: JSON.stringify({
             fnr,
             inntektsaar: parseInt(inntektsaar),
+            useNewApi,
           }),
         },
       );
@@ -117,6 +120,13 @@ export default function Form({
             {currentYear}
           </ToggleGroup.Item>
         </ToggleGroup>
+
+        <Checkbox
+          checked={useNewApi}
+          onChange={(e) => setUseNewApi(e.target.checked)}
+        >
+          Bruk nytt API (sokos-skattekort)
+        </Checkbox>
 
         <Button
           type="submit"

@@ -4,17 +4,24 @@ import { ApiError, HttpStatusCodeError } from "../types/errors";
 import logger from "@utils/logger";
 import { isLocal } from "@utils/environment";
 
-const BASE_API_URL = isLocal
+const OLD_API_URL = isLocal
   ? "http://localhost:3000"
   : process.env.SOKOS_SKATTEKORT_PERSON_API;
+
+const NEW_API_URL = isLocal
+  ? "http://localhost:3000"
+  : process.env.SOKOS_SKATTEKORT_API;
 
 export async function fetchSkattekort(
   query: Request,
   token: string,
 ): Promise<Response> {
+  const useNewApi = query.useNewApi ?? false;
+  const BASE_API_URL = useNewApi ? NEW_API_URL : OLD_API_URL;
+
   if (!BASE_API_URL) {
     throw new Error(
-      "Backend URL is not configured (SOKOS_SKATTEKORT_PERSON_API missing)",
+      `Backend URL is not configured (${useNewApi ? "SOKOS_SKATTEKORT_API" : "SOKOS_SKATTEKORT_PERSON_API"} missing)`,
     );
   }
   const url = `${BASE_API_URL}/api/v1/hent-skattekort`;

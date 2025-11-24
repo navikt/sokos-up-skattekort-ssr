@@ -11,5 +11,7 @@ declare namespace NodeJS {
   interface ProcessEnv {
     SOKOS_SKATTEKORT_PERSON_API: string;
     SOKOS_SKATTEKORT_PERSON_API_AUDIENCE: string;
+    SOKOS_SKATTEKORT_API: string;
+    SOKOS_SKATTEKORT_API_AUDIENCE: string;
   }
 }

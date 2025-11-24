@@ -17,13 +17,19 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
+    const body = await request.json();
+    const validated = RequestSchema.parse(body);
+
     let backendToken = token;
 
     if (!isLocal) {
-      const audience = process.env.SOKOS_SKATTEKORT_PERSON_API_AUDIENCE;
+      const audience = validated.useNewApi
+        ? process.env.SOKOS_SKATTEKORT_API_AUDIENCE
+        : process.env.SOKOS_SKATTEKORT_PERSON_API_AUDIENCE;
+
       if (!audience) {
         throw new Error(
-          "SOKOS_SKATTEKORT_PERSON_API_AUDIENCE environment variable is missing",
+          `Audience environment variable is missing for ${validated.useNewApi ? "new" : "old"} API`,
         );
       }
 
@@ -44,10 +50,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
       backendToken = oboResult.token;
     }
-
-    const body = await request.json();
-
-    const validated = RequestSchema.parse(body);
 
     const data = await fetchSkattekort(validated, backendToken);
 

@@ -10,6 +10,7 @@ export const RequestSchema = z.object({
     .number()
     .min(2000)
     .max(new Date().getFullYear() + 1),
+  useNewApi: z.boolean().optional(),
 });
 
 const ResultatStatusSchema = z.enum([
