@@ -115,3 +115,28 @@ export const SkattekortDataSchema = z.array(
 );
 
 export type SkattekortData = z.infer<typeof SkattekortDataSchema>;
+
+export const ForskuddstrekkDtoSchema = z.object({
+  type: z.string(),
+  trekkode: z.string(),
+  prosentsats: z.number().optional().nullable(),
+  antallMaanederForTrekk: z.number().optional().nullable(),
+  frikortbeloep: z.number().optional().nullable(),
+  tabellnummer: z.string().optional().nullable(),
+});
+
+export const SkattekortDtoSchema = z.object({
+  utstedtDato: z.string().optional().nullable(),
+  skattekortidentifikator: z.number().optional().nullable(),
+  forskuddstrekk: z.array(ForskuddstrekkDtoSchema),
+});
+
+export const SkattekortPersonDtoSchema = z.object({
+  inntektsaar: z.number(),
+  arbeidstakeridentifikator: z.string(),
+  resultatPaaForespoersel: z.string(),
+  skattekort: SkattekortDtoSchema.optional().nullable(),
+  tilleggsopplysning: z.array(z.string()).optional(),
+});
+
+export type SkattekortPersonDto = z.infer<typeof SkattekortPersonDtoSchema>;

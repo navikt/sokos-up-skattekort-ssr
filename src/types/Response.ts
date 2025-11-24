@@ -1,3 +1,6 @@
-import type { SkattekortData } from "./schema/SkattekortSchema";
+import type {
+  SkattekortData,
+  SkattekortPersonDto,
+} from "./schema/SkattekortSchema";
 
-export type Response = SkattekortData;
+export type Response = SkattekortData | SkattekortPersonDto;
