@@ -46,7 +46,7 @@ This is an Astro SSR microfrontend for the NAV Utbetalingsportalen (Payment Port
 ### File Naming
 
 - Astro components: PascalCase (e.g., `Layout.astro`)
-- CSS Modules: `componentName.module.css`
+- CSS Modules: `ComponentName.module.css` (PascalCase for component modules) or `_pageName.module.css` (underscore prefix for page modules)
 - TypeScript files: camelCase for utilities, PascalCase for types
 - Use `.ts` for utility files, `.astro` for components
 
@@ -70,6 +70,13 @@ This is an Astro SSR microfrontend for the NAV Utbetalingsportalen (Payment Port
 - Use `@navikt/oasis` for Azure token validation
 - Token available in `context.locals.token` after middleware
 - Use Bearer token in Authorization header for backend requests
+
+### Backend API Communication
+
+- **Local development**: Use full URL to mock server (`http://localhost:3000`)
+- **Deployed environment**: Use environment variables to resolve backend URLs (Server-to-Server communication)
+- **SSR Pattern**: The Node.js server communicates directly with backends using internal Kubernetes DNS (e.g., `http://sokos-skattekort`)
+- **Authentication**: Use OBO (On-Behalf-Of) flow for server-to-server authentication
 
 ### Type Safety
 
@@ -121,58 +128,11 @@ This is an Astro SSR microfrontend for the NAV Utbetalingsportalen (Payment Port
 ## Commands
 
 - `pnpm dev` - Start development server
+- `pnpm dev:mock` - Start both mock server and dev server concurrently
 - `pnpm build` - Type check and build for production
 - `pnpm mock` - Run mock server for local development
 - `pnpm preview` - Preview production build
 - `pnpm stylelint` - Lint CSS files
-
-## Common Patterns
-
-### Fetching Data with Auth
-
-```typescript
-const fetchData = async (oboToken: string, url: string) => {
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${oboToken}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Http error with status: ${response.status}`);
-  }
-
-  return await response.json();
-};
-```
-
-### Astro Page with React components
-
-```typescript
----
-import AppSwitcher from "@components/appswitcher/AppSwitcher";
-import AppSwitcherSkeleton from "@components/appswitcher/AppSwitcherSkeleton";
-import GuidePanel from "@components/welcomepanel/WelcomePanel";
-import Layout from "@layouts/Layout.astro";
-import styles from "./pageName.module.css";
-
-// Server side code
-const userData = Astro.locals.userData;
----
-
-<Layout title="home">
-  <div class={styles.home}>
-    <div class={styles.homeContent}>
-      <GuidePanel name={userData.name} />
-      <AppSwitcher server:defer adGroups={userData.groups} client:only="react">
-        <AppSwitcherSkeleton slot="fallback" />
-      </AppSwitcher>
-    </div>
-  </div>
-</Layout>
-```
 
 ## Code Quality
 

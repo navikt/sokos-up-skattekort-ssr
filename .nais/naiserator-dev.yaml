@@ -27,13 +27,18 @@ spec:
       allowAllUsers: false
       claims:
         groups:
-          - id: "4a485519-e9aa-483a-a509-0d56816902ff" # 0000-CA-SOKOS-MF-Astro-Template
+          - id: "62e34335-63b3-420a-8978-62d48d218c19" # 0000-CA-SOKOS-MF-Skattekort-ssr
         extra:
           - NAVident
   accessPolicy:
     inbound:
       rules:
         - application: sokos-utbetalingsportalen
+    outbound:
+      external:
+        - host: sokos-skattekort-person.dev-fss-pub.nais.io
+        - host: sokos-skattekort.dev-fss-pub.nais.io
+  webproxy: true
   resources:
     limits:
       memory: 1024Mi
@@ -42,4 +47,10 @@ spec:
       memory: 128Mi
   env:
     - name: SOKOS_SKATTEKORT_PERSON_API
-      value: "https://sokos-skattekort-person"
+      value: https://sokos-skattekort-person.dev-fss-pub.nais.io
+    - name: SOKOS_SKATTEKORT_PERSON_API_AUDIENCE
+      value: "api://dev-fss.okonomi.sokos-skattekort-person/.default"
+    - name: SOKOS_SKATTEKORT_API
+      value: https://sokos-skattekort.dev-fss-pub.nais.io
+    - name: SOKOS_SKATTEKORT_API_AUDIENCE
+      value: "api://dev-fss.okonomi.sokos-skattekort/.default"

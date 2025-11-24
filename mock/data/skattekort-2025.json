@@ -1,0 +1,35 @@
+[
+  {
+    "navn": "Ola Nordmann",
+    "arbeidsgiver": [
+      {
+        "arbeidsgiveridentifikator": {
+          "organisasjonsnummer": "123456789"
+        },
+        "arbeidstaker": [
+          {
+            "inntektsaar": 2025,
+            "arbeidstakeridentifikator": "12345678901",
+            "resultatPaaForespoersel": "skattekortopplysningerOK",
+            "skattekort": {
+              "utstedtDato": "2024-12-15",
+              "skattekortidentifikator": 123,
+              "forskuddstrekk": [
+                {
+                  "type": "Trekkprosent",
+                  "trekkode": "loennFraHovedarbeidsgiver",
+                  "prosentsats": 35
+                },
+                {
+                  "type": "Trekktabell",
+                  "trekkode": "loennFraBiarbeidsgiver",
+                  "tabellnummer": "7100"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
