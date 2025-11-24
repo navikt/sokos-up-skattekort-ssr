@@ -40,6 +40,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       try {
         backendToken = await getOboToken(token, audience);
       } catch (e) {
+        logger.error({ error: e }, "OBO token exchange failed");
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
           status: 401,
           headers: { "Content-Type": "application/json" },
