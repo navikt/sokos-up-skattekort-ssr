@@ -163,7 +163,7 @@ export default function Form({
                   {ag.arbeidsgiveridentifikator.organisasjonsnummer}
                 </Heading>
 
-                {ag.arbeidstaker.map((at, atIndex) => (
+                {ag.arbeidstaker.map((at) => (
                   <div
                     key={at.arbeidstakeridentifikator}
                     className={styles.arbeidstaker}
