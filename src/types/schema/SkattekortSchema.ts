@@ -13,6 +13,8 @@ export const RequestSchema = z.object({
   useNewApi: z.boolean().optional(),
 });
 
+export type Request = z.infer<typeof RequestSchema>;
+
 const ResultatStatusSchema = z.enum([
   "ikkeSkattekort",
   "skattekortopplysningerOK",
@@ -79,21 +81,21 @@ const ForskuddstrekkSchema = z.discriminatedUnion("type", [
 export type Forskuddstrekk = z.infer<typeof ForskuddstrekkSchema>;
 
 const SkattekortSchema = z.object({
-  utstedtDato: z.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}/),
+  utstedtDato: z.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}$/),
   skattekortidentifikator: z.number(),
   forskuddstrekk: z.array(ForskuddstrekkSchema),
 });
 
 const ArbeidstakerSchema = z.object({
   inntektsaar: z.number(),
-  arbeidstakeridentifikator: z.string().regex(/[0-9]{11}/),
+  arbeidstakeridentifikator: z.string().regex(/[0-9]{11}$/),
   resultatPaaForespoersel: ResultatStatusSchema,
   skattekort: z.optional(SkattekortSchema),
   tilleggsopplysning: z.optional(z.array(TilleggsopplysningSchema)),
 });
 
 const ArbeidsgiveridentifikatorSchema = z.object({
-  organisasjonsnummer: z.string().regex(/[0-9]{9}/),
+  organisasjonsnummer: z.string().regex(/[0-9]{9}$/),
 });
 
 export type Arbeidsgiveridentifikator = z.infer<

@@ -5,22 +5,6 @@
 1. Installere [Node.js](https://nodejs.dev/en/)
 2. Installer [pnpm](https://pnpm.io/)
 3. Installere dependencies `pnpm install`
-4. Start appen med to følgende måter:
-
-- Mot [hono.dev](https://hono.dev/) mock server -> `pnpm run mock` i en terminal, og deretter `pnpm run dev` i en annen terminal
-- Mot backend -> Sett miljøvariabel `SKATTEKORT_API_URL` og kjør `pnpm run dev`
-
-5. Appen nås på [http://localhost:4321](http://localhost:4321)
-
-## Funksjoner
-
-### Skattekort
-
-Applikasjonen har et skattekort-søk som gjør det mulig å:
-
-- Søke etter skattekort basert på fødselsnummer (11 siffer)
-- Velge mellom inneværende og forrige år
-- Se skattekortinformasjon inkludert prosentsats, tabellnummer og trekkgrunn
 
 **Utvikling:**
 

@@ -1,5 +1,5 @@
 import type { Response } from "../types/Response";
-import type { Request } from "../types/Request";
+import type { Request } from "@schema/SkattekortSchema";
 import { ApiError, HttpStatusCodeError } from "../types/errors";
 import logger from "@utils/logger";
 import { isLocal } from "@utils/environment";

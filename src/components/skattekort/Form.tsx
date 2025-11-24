@@ -164,7 +164,10 @@ export default function Form({
                 </Heading>
 
                 {ag.arbeidstaker.map((at, atIndex) => (
-                  <div key={atIndex} className={styles.arbeidstaker}>
+                  <div
+                    key={at.arbeidstakeridentifikator}
+                    className={styles.arbeidstaker}
+                  >
                     <dl className={styles.details}>
                       <dt>Inntektsår:</dt>
                       <dd>{at.inntektsaar}</dd>
@@ -185,7 +188,9 @@ export default function Form({
                             <ul className={styles.forskuddstrekkList}>
                               {at.skattekort.forskuddstrekk.map(
                                 (ft, ftIndex) => (
-                                  <li key={ftIndex}>
+                                  <li
+                                    key={`${ft.trekkode}-${ft.type}-${ftIndex}`}
+                                  >
                                     <strong>{ft.type}</strong> ({ft.trekkode})
                                     {ft.type === "Trekkprosent" &&
                                       ft.prosentsats && (
