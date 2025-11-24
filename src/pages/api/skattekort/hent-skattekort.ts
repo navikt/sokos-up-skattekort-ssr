@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { ZodError } from "zod";
 import { RequestSchema } from "@schema/SkattekortSchema";
 import { fetchSkattekort } from "@utils/api";
 import { ApiError, HttpStatusCodeError } from "../../../types/errors";
@@ -78,9 +79,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
-    if (error && typeof error === "object" && "issues" in error) {
+    if (error instanceof ZodError) {
       return new Response(
-        JSON.stringify({ error: "Validation error", details: error }),
+        JSON.stringify({ error: "Validation error", details: error.issues }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
