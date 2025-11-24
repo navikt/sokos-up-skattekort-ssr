@@ -7,6 +7,7 @@ import {
   TextField,
   ToggleGroup,
 } from "@navikt/ds-react";
+import { actions } from "astro:actions";
 import { useState } from "react";
 import type { Response } from "../../types/Response";
 import styles from "./Form.module.css";
@@ -59,30 +60,19 @@ export default function Form({
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${import.meta.env.BASE_URL}/api/skattekort/hent-skattekort`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            fnr,
-            inntektsaar: parseInt(inntektsaar),
-            useNewApi,
-          }),
-        },
-      );
+      const { data, error } = await actions.hentSkattekort({
+        fnr,
+        inntektsaar: parseInt(inntektsaar),
+        useNewApi,
+      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (error) {
         throw new Error(
-          errorData.error || "Noe gikk galt ved henting av skattekort",
+          error.message || "Noe gikk galt ved henting av skattekort",
         );
       }
 
-      const result = await response.json();
-      setData(result);
+      setData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Noe gikk galt");
     } finally {
