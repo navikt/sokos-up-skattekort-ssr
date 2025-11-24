@@ -73,13 +73,10 @@ This is an Astro SSR microfrontend for the NAV Utbetalingsportalen (Payment Port
 
 ### Backend API Communication
 
-**Important**: This SSR microfrontend is embedded in the Utbetalingsportalen container app, which handles proxy routing to backend services.
-
 - **Local development**: Use full URL to mock server (`http://localhost:3000`)
-- **Deployed environment**: Use relative proxy paths (e.g., `/skattekort-api/api/v1/...`)
-- The container app proxies requests through `SOKOS_SKATTEKORT_PERSON_API_PROXY: "/skattekort-api"` to the actual backend
-- Do NOT use environment variables for backend URLs in deployed environments - rely on the container app's proxy configuration
-- This approach is identical to client-side microfrontends, where the browser makes requests through the same proxy
+- **Deployed environment**: Use environment variables to resolve backend URLs (Server-to-Server communication)
+- **SSR Pattern**: The Node.js server communicates directly with backends using internal Kubernetes DNS (e.g., `http://sokos-skattekort`)
+- **Authentication**: Use OBO (On-Behalf-Of) flow for server-to-server authentication
 
 ### Type Safety
 
@@ -136,15 +133,6 @@ This is an Astro SSR microfrontend for the NAV Utbetalingsportalen (Payment Port
 - `pnpm mock` - Run mock server for local development
 - `pnpm preview` - Preview production build
 - `pnpm stylelint` - Lint CSS files
-
-## Common Patterns
-
-**Use API Routes (not Astro Actions) for forms** because:
-
-- Direct access to `context.locals.token` from middleware
-- Full control over request/response handling for backend proxying
-- Consistent with existing `/api/*` structure
-- Better for authenticated backend requests
 
 ## Code Quality
 
