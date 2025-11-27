@@ -4,7 +4,7 @@ import { cors } from "hono/cors";
 import skattekort2024 from "./data/skattekort-2024.json";
 import skattekort2025 from "./data/skattekort-2025.json";
 import skattekort2026 from "./data/skattekort-2026.json";
-import skattekortIkkeSkattekort from "./data/ikke-skattekort.json";
+import ikkeSkattekort from "./data/ikke-skattekort.json";
 
 const api = new Hono();
 
@@ -31,7 +31,7 @@ api.post("/api/v1/hent-skattekort", async (c) => {
   }
 
   if (fnr === "22222222222") {
-    return c.json(skattekortIkkeSkattekort);
+    return c.json(ikkeSkattekort);
   }
 
   const year = Number(inntektsaar);

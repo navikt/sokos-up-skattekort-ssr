@@ -12,14 +12,12 @@ export async function fetchSkattekort(
   query: Request,
   token: string,
 ): Promise<Response> {
-  const BASE_API_URL = API_URL;
-
-  if (!BASE_API_URL) {
+  if (!API_URL) {
     throw new Error(
       `Backend URL is not configured (SOKOS_SKATTEKORT_API missing)`,
     );
   }
-  const url = `${BASE_API_URL}/api/v1/hent-skattekort`;
+  const url = `${API_URL}/api/v1/hent-skattekort`;
 
   logger.info(`Fetching skattekort from: ${url}`);
 
