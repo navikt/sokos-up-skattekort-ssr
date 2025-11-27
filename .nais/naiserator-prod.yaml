@@ -32,5 +32,7 @@ spec:
       cpu: 50m
       memory: 128Mi
   env:
-    - name: SOKOS_SKATTEKORT_PERSON_API
-      value: "https://sokos-skattekort-person"
+    - name: SOKOS_SKATTEKORT_API
+      value: https://sokos-skattekort.prod-fss-pub.nais.io
+    - name: SOKOS_SKATTEKORT_API_AUDIENCE
+      value: "api://prod-fss.okonomi.sokos-skattekort/.default"

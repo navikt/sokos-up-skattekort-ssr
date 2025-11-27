@@ -4,11 +4,7 @@ import { ApiError, HttpStatusCodeError } from "../types/errors";
 import logger from "@utils/logger";
 import { isLocal } from "@utils/environment";
 
-const OLD_API_URL = isLocal
-  ? "http://localhost:3000"
-  : process.env.SOKOS_SKATTEKORT_PERSON_API;
-
-const NEW_API_URL = isLocal
+const API_URL = isLocal
   ? "http://localhost:3000"
   : process.env.SOKOS_SKATTEKORT_API;
 
@@ -16,15 +12,12 @@ export async function fetchSkattekort(
   query: Request,
   token: string,
 ): Promise<Response> {
-  const { useNewApi, ...payload } = query;
-  const BASE_API_URL = useNewApi ? NEW_API_URL : OLD_API_URL;
-
-  if (!BASE_API_URL) {
+  if (!API_URL) {
     throw new Error(
-      `Backend URL is not configured (${useNewApi ? "SOKOS_SKATTEKORT_API" : "SOKOS_SKATTEKORT_PERSON_API"} missing)`,
+      `Backend URL is not configured (SOKOS_SKATTEKORT_API missing)`,
     );
   }
-  const url = `${BASE_API_URL}/api/v1/hent-skattekort`;
+  const url = `${API_URL}/api/v1/hent-skattekort`;
 
   logger.info(`Fetching skattekort from: ${url}`);
 
@@ -37,7 +30,7 @@ export async function fetchSkattekort(
         Pragma: "no-cache",
         "Cache-Control": "no-cache",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(query),
     });
 
     if (!response.ok) {
