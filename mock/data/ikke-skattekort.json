@@ -1,0 +1,11 @@
+[
+  {
+    "inntektsaar": 2025,
+    "arbeidstakeridentifikator": "22222222222",
+    "resultatPaaForespoersel": "ikkeSkattekort",
+    "skattekort": {
+      "forskuddstrekk": []
+    },
+    "tilleggsopplysning": []
+  }
+]

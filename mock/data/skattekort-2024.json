@@ -1,0 +1,19 @@
+[
+  {
+    "inntektsaar": 2024,
+    "arbeidstakeridentifikator": "12345678901",
+    "resultatPaaForespoersel": "skattekortopplysningerOK",
+    "skattekort": {
+      "utstedtDato": "2023-12-15",
+      "skattekortidentifikator": 124,
+      "forskuddstrekk": [
+        {
+          "type": "Trekkprosent",
+          "trekkode": "loennFraHovedarbeidsgiver",
+          "prosentsats": 34
+        }
+      ]
+    },
+    "tilleggsopplysning": ["En opplysning"]
+  }
+]

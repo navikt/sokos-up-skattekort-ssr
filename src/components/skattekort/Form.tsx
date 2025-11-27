@@ -100,6 +100,9 @@ export default function Form({
           onChange={(value) => setInntektsaar(value)}
           size="small"
         >
+          <ToggleGroup.Item value={(currentYear - 1).toString()}>
+            {currentYear - 1}
+          </ToggleGroup.Item>
           <ToggleGroup.Item value={currentYear.toString()}>
             {currentYear}
           </ToggleGroup.Item>
@@ -146,31 +149,54 @@ export default function Form({
 
                 {at.skattekort && (
                   <>
-                    <dt>Utstedt dato:</dt>
-                    <dd>{at.skattekort.utstedtDato}</dd>
+                    {at.skattekort.utstedtDato && (
+                      <>
+                        <dt>Utstedt dato:</dt>
+                        <dd>{at.skattekort.utstedtDato}</dd>
+                      </>
+                    )}
 
-                    <dt>Skattekort ID:</dt>
-                    <dd>{at.skattekort.skattekortidentifikator}</dd>
+                    {at.skattekort.skattekortidentifikator && (
+                      <>
+                        <dt>Skattekort ID:</dt>
+                        <dd>{at.skattekort.skattekortidentifikator}</dd>
+                      </>
+                    )}
 
-                    <dt>Forskuddstrekk:</dt>
-                    <dd>
-                      <ul className={styles.forskuddstrekkList}>
-                        {at.skattekort.forskuddstrekk?.map((ft, ftIndex) => (
-                          <li key={`${ft.trekkode}-${ft.type}-${ftIndex}`}>
-                            <strong>{ft.type}</strong> ({ft.trekkode})
-                            {ft.type === "Trekkprosent" && ft.prosentsats && (
-                              <span> - {ft.prosentsats}%</span>
-                            )}
-                            {ft.type === "Trekktabell" && ft.tabellnummer && (
-                              <span> - Tabell {ft.tabellnummer}</span>
-                            )}
-                            {ft.type === "Frikort" && ft.frikortbeloep && (
-                              <span> - Frikortbeløp: {ft.frikortbeloep}</span>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </dd>
+                    {at.skattekort.forskuddstrekk &&
+                      at.skattekort.forskuddstrekk.length > 0 && (
+                        <>
+                          <dt>Forskuddstrekk:</dt>
+                          <dd>
+                            <ul className={styles.forskuddstrekkList}>
+                              {at.skattekort.forskuddstrekk.map(
+                                (ft, ftIndex) => (
+                                  <li
+                                    key={`${ft.trekkode}-${ft.type}-${ftIndex}`}
+                                  >
+                                    <strong>{ft.type}</strong> ({ft.trekkode})
+                                    {ft.type === "Trekkprosent" &&
+                                      ft.prosentsats && (
+                                        <span> - {ft.prosentsats}%</span>
+                                      )}
+                                    {ft.type === "Trekktabell" &&
+                                      ft.tabellnummer && (
+                                        <span> - Tabell {ft.tabellnummer}</span>
+                                      )}
+                                    {ft.type === "Frikort" &&
+                                      ft.frikortbeloep && (
+                                        <span>
+                                          {" "}
+                                          - Frikortbeløp: {ft.frikortbeloep}
+                                        </span>
+                                      )}
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          </dd>
+                        </>
+                      )}
                   </>
                 )}
 
