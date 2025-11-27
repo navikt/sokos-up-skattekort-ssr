@@ -10,14 +10,18 @@ export const RequestSchema = z.object({
     .number()
     .min(2000)
     .max(new Date().getFullYear() + 1),
-  useNewApi: z.boolean().optional(),
 });
 
 export type Request = z.infer<typeof RequestSchema>;
 
 const ResultatStatusSchema = z.enum([
   "ikkeSkattekort",
+  "vurderArbeidstillatelse",
+  "ikkeTrekkplikt",
   "skattekortopplysningerOK",
+  "ugyldigOrganisasjonsnummer",
+  "ugyldigFoedselsEllerDnummer",
+  "utgaattDnummerSkattekortForFoedselsnummerErLevert",
 ] as const);
 
 const TrekkodeSchema = z.enum([
@@ -45,11 +49,6 @@ const TilleggsopplysningSchema = z.enum([
 
 export type Tilleggsopplysning = z.infer<typeof TilleggsopplysningSchema>;
 
-const TabelltypeSchema = z.enum([
-  "trekktabellForPensjon",
-  "trekktabellForLoenn",
-] as const);
-
 const FrikortSchema = z.object({
   type: z.literal("Frikort"),
   trekkode: TrekkodeSchema,
@@ -59,7 +58,6 @@ const FrikortSchema = z.object({
 const TrekktabellSchema = z.object({
   type: z.literal("Trekktabell"),
   trekkode: TrekkodeSchema,
-  tabelltype: TabelltypeSchema.optional(),
   tabellnummer: z.string().optional(),
   prosentsats: z.number().optional(),
   antallMaanederForTrekk: z.number().optional(),
@@ -81,37 +79,21 @@ const ForskuddstrekkSchema = z.discriminatedUnion("type", [
 export type Forskuddstrekk = z.infer<typeof ForskuddstrekkSchema>;
 
 const SkattekortSchema = z.object({
-  utstedtDato: z.string().regex(/[0-9]{4}-[0-9]{2}-[0-9]{2}$/),
-  skattekortidentifikator: z.number(),
-  forskuddstrekk: z.array(ForskuddstrekkSchema),
+  utstedtDato: z.string().optional(),
+  skattekortidentifikator: z.number().optional(),
+  forskuddstrekk: z.array(ForskuddstrekkSchema).optional(),
 });
 
 const ArbeidstakerSchema = z.object({
   inntektsaar: z.number(),
-  arbeidstakeridentifikator: z.string().regex(/[0-9]{11}$/),
+  arbeidstakeridentifikator: z.string(),
   resultatPaaForespoersel: ResultatStatusSchema,
   skattekort: z.optional(SkattekortSchema),
   tilleggsopplysning: z.optional(z.array(TilleggsopplysningSchema)),
 });
 
-const ArbeidsgiveridentifikatorSchema = z.object({
-  organisasjonsnummer: z.string().regex(/[0-9]{9}$/),
-});
+export type Arbeidstaker = z.infer<typeof ArbeidstakerSchema>;
 
-export type Arbeidsgiveridentifikator = z.infer<
-  typeof ArbeidsgiveridentifikatorSchema
->;
-
-const ArbeidsgiverSchema = z.object({
-  arbeidstaker: z.array(ArbeidstakerSchema),
-  arbeidsgiveridentifikator: ArbeidsgiveridentifikatorSchema,
-});
-
-export const SkattekortDataSchema = z.array(
-  z.object({
-    navn: z.optional(z.string()),
-    arbeidsgiver: z.array(ArbeidsgiverSchema),
-  }),
-);
+export const SkattekortDataSchema = z.array(ArbeidstakerSchema);
 
 export type SkattekortData = z.infer<typeof SkattekortDataSchema>;

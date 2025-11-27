@@ -1,7 +1,6 @@
 import {
   Alert,
   Button,
-  Checkbox,
   Heading,
   Loader,
   TextField,
@@ -21,7 +20,6 @@ export default function Form({
 }: SkattekortFormProps) {
   const [fnr, setFnr] = useState("");
   const [inntektsaar, setInntektsaar] = useState(currentYear.toString());
-  const [useNewApi, setUseNewApi] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<Response | null>(null);
@@ -63,7 +61,6 @@ export default function Form({
       const { data, error } = await actions.hentSkattekort({
         fnr,
         inntektsaar: parseInt(inntektsaar),
-        useNewApi,
       });
 
       if (error) {
@@ -103,20 +100,13 @@ export default function Form({
           onChange={(value) => setInntektsaar(value)}
           size="small"
         >
-          <ToggleGroup.Item value={(currentYear - 1).toString()}>
-            {currentYear - 1}
-          </ToggleGroup.Item>
           <ToggleGroup.Item value={currentYear.toString()}>
             {currentYear}
           </ToggleGroup.Item>
+          <ToggleGroup.Item value={(currentYear + 1).toString()}>
+            {currentYear + 1}
+          </ToggleGroup.Item>
         </ToggleGroup>
-
-        <Checkbox
-          checked={useNewApi}
-          onChange={(e) => setUseNewApi(e.target.checked)}
-        >
-          Bruk nytt API (sokos-skattekort)
-        </Checkbox>
 
         <Button
           type="submit"
@@ -140,83 +130,58 @@ export default function Form({
       )}
 
       {data &&
-        data.map((person, pIndex) => (
-          <div key={pIndex} className={styles.result}>
+        data.map((at, index) => (
+          <div key={index} className={styles.result}>
             <Heading level="3" size="small" spacing>
-              Skattekort for {person.navn || "Ukjent navn"}
+              Skattekort for {at.arbeidstakeridentifikator}
             </Heading>
 
-            {person.arbeidsgiver.map((ag, agIndex) => (
-              <div key={agIndex} className={styles.arbeidsgiver}>
-                <Heading level="4" size="xsmall" spacing>
-                  Arbeidsgiver:{" "}
-                  {ag.arbeidsgiveridentifikator.organisasjonsnummer}
-                </Heading>
+            <div className={styles.arbeidstaker}>
+              <dl className={styles.details}>
+                <dt>Inntektsår:</dt>
+                <dd>{at.inntektsaar}</dd>
 
-                {ag.arbeidstaker.map((at) => (
-                  <div
-                    key={at.arbeidstakeridentifikator}
-                    className={styles.arbeidstaker}
-                  >
-                    <dl className={styles.details}>
-                      <dt>Inntektsår:</dt>
-                      <dd>{at.inntektsaar}</dd>
+                <dt>Resultat:</dt>
+                <dd>{at.resultatPaaForespoersel}</dd>
 
-                      <dt>Resultat:</dt>
-                      <dd>{at.resultatPaaForespoersel}</dd>
+                {at.skattekort && (
+                  <>
+                    <dt>Utstedt dato:</dt>
+                    <dd>{at.skattekort.utstedtDato}</dd>
 
-                      {at.skattekort && (
-                        <>
-                          <dt>Utstedt dato:</dt>
-                          <dd>{at.skattekort.utstedtDato}</dd>
+                    <dt>Skattekort ID:</dt>
+                    <dd>{at.skattekort.skattekortidentifikator}</dd>
 
-                          <dt>Skattekort ID:</dt>
-                          <dd>{at.skattekort.skattekortidentifikator}</dd>
+                    <dt>Forskuddstrekk:</dt>
+                    <dd>
+                      <ul className={styles.forskuddstrekkList}>
+                        {at.skattekort.forskuddstrekk?.map((ft, ftIndex) => (
+                          <li key={`${ft.trekkode}-${ft.type}-${ftIndex}`}>
+                            <strong>{ft.type}</strong> ({ft.trekkode})
+                            {ft.type === "Trekkprosent" && ft.prosentsats && (
+                              <span> - {ft.prosentsats}%</span>
+                            )}
+                            {ft.type === "Trekktabell" && ft.tabellnummer && (
+                              <span> - Tabell {ft.tabellnummer}</span>
+                            )}
+                            {ft.type === "Frikort" && ft.frikortbeloep && (
+                              <span> - Frikortbeløp: {ft.frikortbeloep}</span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </dd>
+                  </>
+                )}
 
-                          <dt>Forskuddstrekk:</dt>
-                          <dd>
-                            <ul className={styles.forskuddstrekkList}>
-                              {at.skattekort.forskuddstrekk.map(
-                                (ft, ftIndex) => (
-                                  <li
-                                    key={`${ft.trekkode}-${ft.type}-${ftIndex}`}
-                                  >
-                                    <strong>{ft.type}</strong> ({ft.trekkode})
-                                    {ft.type === "Trekkprosent" &&
-                                      ft.prosentsats && (
-                                        <span> - {ft.prosentsats}%</span>
-                                      )}
-                                    {ft.type === "Trekktabell" &&
-                                      ft.tabellnummer && (
-                                        <span> - Tabell {ft.tabellnummer}</span>
-                                      )}
-                                    {ft.type === "Frikort" &&
-                                      ft.frikortbeloep && (
-                                        <span>
-                                          {" "}
-                                          - Frikortbeløp: {ft.frikortbeloep}
-                                        </span>
-                                      )}
-                                  </li>
-                                ),
-                              )}
-                            </ul>
-                          </dd>
-                        </>
-                      )}
-
-                      {at.tilleggsopplysning &&
-                        at.tilleggsopplysning.length > 0 && (
-                          <>
-                            <dt>Tilleggsopplysninger:</dt>
-                            <dd>{at.tilleggsopplysning.join(", ")}</dd>
-                          </>
-                        )}
-                    </dl>
-                  </div>
-                ))}
-              </div>
-            ))}
+                {at.tilleggsopplysning && at.tilleggsopplysning.length > 0 && (
+                  <>
+                    <dt>Tilleggsopplysninger:</dt>
+                    <dd>{at.tilleggsopplysning.join(", ")}</dd>
+                  </>
+                )}
+              </dl>
+            </div>
           </div>
         ))}
     </div>

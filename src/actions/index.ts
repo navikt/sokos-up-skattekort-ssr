@@ -22,14 +22,10 @@ export const server = {
       let backendToken = token;
 
       if (!isLocal) {
-        const audience = input.useNewApi
-          ? process.env.SOKOS_SKATTEKORT_API_AUDIENCE
-          : process.env.SOKOS_SKATTEKORT_PERSON_API_AUDIENCE;
+        const audience = process.env.SOKOS_SKATTEKORT_API_AUDIENCE;
 
         if (!audience) {
-          logger.error(
-            `Audience missing for ${input.useNewApi ? "new" : "old"} API`,
-          );
+          logger.error(`Audience missing for API`);
           throw new ActionError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Configuration error",

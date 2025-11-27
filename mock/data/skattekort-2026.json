@@ -1,21 +1,16 @@
 [
   {
-    "inntektsaar": 2025,
+    "inntektsaar": 2026,
     "arbeidstakeridentifikator": "12345678901",
     "resultatPaaForespoersel": "skattekortopplysningerOK",
     "skattekort": {
-      "utstedtDato": "2024-12-15",
-      "skattekortidentifikator": 123,
+      "utstedtDato": "2025-12-15",
+      "skattekortidentifikator": 124,
       "forskuddstrekk": [
         {
           "type": "Trekkprosent",
           "trekkode": "loennFraHovedarbeidsgiver",
-          "prosentsats": 35
-        },
-        {
-          "type": "Trekktabell",
-          "trekkode": "loennFraBiarbeidsgiver",
-          "tabellnummer": "7100"
+          "prosentsats": 34
         }
       ]
     },
