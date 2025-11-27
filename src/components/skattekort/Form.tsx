@@ -25,6 +25,18 @@ export default function Form({
   const [data, setData] = useState<Response | null>(null);
   const [fnrError, setFnrError] = useState<string | null>(null);
 
+  const getYears = () => {
+    const now = new Date();
+    const isAfterDec15 = now.getMonth() === 11 && now.getDate() >= 15;
+
+    if (isAfterDec15) {
+      return [currentYear, currentYear + 1];
+    }
+    return [currentYear - 1, currentYear];
+  };
+
+  const years = getYears();
+
   const validateFnr = (value: string): string | null => {
     if (!value) {
       return "Fødselsnummer er påkrevd";
@@ -100,15 +112,11 @@ export default function Form({
           onChange={(value) => setInntektsaar(value)}
           size="small"
         >
-          <ToggleGroup.Item value={(currentYear - 1).toString()}>
-            {currentYear - 1}
-          </ToggleGroup.Item>
-          <ToggleGroup.Item value={currentYear.toString()}>
-            {currentYear}
-          </ToggleGroup.Item>
-          <ToggleGroup.Item value={(currentYear + 1).toString()}>
-            {currentYear + 1}
-          </ToggleGroup.Item>
+          {years.map((year) => (
+            <ToggleGroup.Item key={year} value={year.toString()}>
+              {year}
+            </ToggleGroup.Item>
+          ))}
         </ToggleGroup>
 
         <Button
