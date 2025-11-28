@@ -76,6 +76,9 @@ export async function fetchSkattekort(
     }
 
     const data = await response.json();
+
+    console.log("API Response:", JSON.stringify(data, null, 2));
+
     return data as Response;
   } catch (error) {
     logger.error(
