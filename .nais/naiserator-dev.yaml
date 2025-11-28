@@ -34,6 +34,9 @@ spec:
     inbound:
       rules:
         - application: sokos-utbetalingsportalen
+    outbound:
+      rules:
+        - application: sokos-skattekort
   webproxy: true
   resources:
     limits:
@@ -43,6 +46,6 @@ spec:
       memory: 128Mi
   env:
     - name: SOKOS_SKATTEKORT_API
-      value: https://sokos-skattekort.intern.dev.nav.no
+      value: https://sokos-skattekort:8080
     - name: SOKOS_SKATTEKORT_API_AUDIENCE
       value: "api://dev-gcp.okonomi.sokos-skattekort/.default"
