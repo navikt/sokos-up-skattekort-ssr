@@ -46,6 +46,6 @@ spec:
       memory: 128Mi
   env:
     - name: SOKOS_SKATTEKORT_API
-      value: https://sokos-skattekort:8080
+      value: http://sokos-skattekort:8080
     - name: SOKOS_SKATTEKORT_API_AUDIENCE
       value: "api://dev-gcp.okonomi.sokos-skattekort/.default"
