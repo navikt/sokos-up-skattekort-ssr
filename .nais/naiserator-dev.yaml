@@ -35,8 +35,8 @@ spec:
       rules:
         - application: sokos-utbetalingsportalen
     outbound:
-      external:
-        - host: sokos-skattekort.dev-fss-pub.nais.io
+      rules:
+        - application: sokos-skattekort
   webproxy: true
   resources:
     limits:
@@ -46,6 +46,6 @@ spec:
       memory: 128Mi
   env:
     - name: SOKOS_SKATTEKORT_API
-      value: https://sokos-skattekort.dev-fss-pub.nais.io
+      value: http://sokos-skattekort
     - name: SOKOS_SKATTEKORT_API_AUDIENCE
-      value: "api://dev-fss.okonomi.sokos-skattekort/.default"
+      value: "api://dev-gcp.okonomi.sokos-skattekort/.default"
