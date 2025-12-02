@@ -4,6 +4,11 @@
   padding: 2rem;
 }
 
-.header {
-  margin-bottom: 2rem;
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.alert {
+  margin-top: 1.5rem;
 }

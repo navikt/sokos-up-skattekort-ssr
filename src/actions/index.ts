@@ -1,14 +1,27 @@
 import { defineAction, ActionError } from "astro:actions";
-import { RequestSchema } from "@schema/SkattekortSchema";
+import { z } from "astro:schema";
 import { getOboToken } from "@utils/token";
 import { fetchSkattekort } from "@utils/api";
 import { isLocal } from "@utils/environment";
 import logger from "@utils/logger";
 import { HttpStatusCodeError } from "../types/errors";
 
+const FormRequestSchema = z.object({
+  fnr: z
+    .string()
+    .min(11, "Fødselsnummer må være 11 siffer")
+    .max(11, "Fødselsnummer må være 11 siffer")
+    .regex(/^\d{11}$/, "Fødselsnummer må inneholde kun tall"),
+  inntektsaar: z.coerce
+    .number()
+    .min(2000)
+    .max(new Date().getFullYear() + 1),
+});
+
 export const server = {
   hentSkattekort: defineAction({
-    input: RequestSchema,
+    accept: "form",
+    input: FormRequestSchema,
     handler: async (input, context) => {
       const token = context.locals.token;
 

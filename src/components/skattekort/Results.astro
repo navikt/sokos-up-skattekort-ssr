@@ -1,0 +1,85 @@
+---
+import { Alert, Heading } from "@navikt/ds-react";
+import type { Response } from "../../types/Response";
+import styles from "./Form.module.css";
+
+interface Props {
+  data: Response;
+}
+
+const { data } = Astro.props;
+---
+
+{
+  data.length === 0 && (
+    <Alert variant="info" className={styles.alert}>
+      Ingen skattekort funnet for det valgte året.
+    </Alert>
+  )
+}
+
+{
+  data.map((at) => (
+    <div class={styles.result}>
+      <Heading level="3" size="small" spacing>
+        Skattekort for {at.arbeidstakeridentifikator}
+      </Heading>
+
+      <div class={styles.arbeidstaker}>
+        <dl class={styles.details}>
+          <dt>Inntektsår:</dt>
+          <dd>{at.inntektsaar}</dd>
+
+          <dt>Resultat:</dt>
+          <dd>{at.resultatPaaForespoersel}</dd>
+
+          {at.skattekort?.utstedtDato && (
+            <>
+              <dt>Utstedt dato:</dt>
+              <dd>{at.skattekort.utstedtDato}</dd>
+            </>
+          )}
+
+          {at.skattekort?.skattekortidentifikator && (
+            <>
+              <dt>Skattekort ID:</dt>
+              <dd>{at.skattekort.skattekortidentifikator}</dd>
+            </>
+          )}
+
+          {at.skattekort?.forskuddstrekk &&
+            at.skattekort.forskuddstrekk.length > 0 && (
+              <>
+                <dt>Forskuddstrekk:</dt>
+                <dd>
+                  <ul class={styles.forskuddstrekkList}>
+                    {at.skattekort.forskuddstrekk.map((ft) => (
+                      <li>
+                        <strong>{ft.type}</strong> ({ft.trekkode})
+                        {ft.type === "Trekkprosent" && ft.prosentsats && (
+                          <span> - {ft.prosentsats}%</span>
+                        )}
+                        {ft.type === "Trekktabell" && ft.tabellnummer && (
+                          <span> - Tabell {ft.tabellnummer}</span>
+                        )}
+                        {ft.type === "Frikort" && ft.frikortbeloep && (
+                          <span> - Frikortbeløp: {ft.frikortbeloep}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </>
+            )}
+
+          {at.tilleggsopplysning && at.tilleggsopplysning.length > 0 && (
+            <>
+              <dt>Tilleggsopplysninger:</dt>
+              <dd>{at.tilleggsopplysning.join(", ")}</dd>
+            </>
+          )}
+        </dl>
+      </div>
+    </div>
+  ))
+}
