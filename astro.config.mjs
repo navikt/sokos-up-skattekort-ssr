@@ -6,6 +6,7 @@ import prefixer from "postcss-prefix-selector";
 // https://astro.build/config
 export default defineConfig({
   base: "/skattekort-ssr",
+  compressHTML: true,
   build: {
     inlineStylesheets: "always",
   },
@@ -14,10 +15,21 @@ export default defineConfig({
       postcss: {
         plugins: [
           prefixer({
-            prefix: ".sokos-up-skattekort-ssr", // brukes for å unngå å lekke css ut av mikrofrontenden
+            prefix: ".sokos-up-skattekort-ssr",
             ignoreFiles: [/module.css/],
           }),
         ],
+      },
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            if (id.includes("@navikt/ds-react")) {
+              return "navikt-ds";
+            }
+          },
+        },
       },
     },
   },
@@ -31,7 +43,7 @@ export default defineConfig({
             vite.build.rollupOptions["external"] = [
               "react",
               "react-dom",
-              "jsx-runtime",
+              "react/jsx-runtime",
             ];
           }
         },

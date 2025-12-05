@@ -1,11 +1,59 @@
 ---
 import Layout from "@components/layout/Layout.astro";
-import Form from "@components/skattekort/Form";
+import SearchForm from "@components/skattekort/SearchForm.astro";
+import SkattekortResults from "@components/skattekort/SkattekortResults.astro";
+import { getSkattekort, getDefaultYear } from "@utils/skattekort";
+import { RequestSchema } from "@schema/SkattekortSchema";
+import type { Response } from "../types/Response";
 import styles from "./_index.module.css";
+
+let searchData: Response | null = null;
+let searchError: string | null = null;
+let submittedFnr = "";
+let submittedYear = getDefaultYear();
+let fnrValidationError: string | undefined;
+let hasSearched = false;
+
+if (Astro.request.method === "POST") {
+  try {
+    const formData = await Astro.request.formData();
+    const fnr = formData.get("fnr")?.toString() ?? "";
+    const inntektsaar = parseInt(
+      formData.get("inntektsaar")?.toString() ?? getDefaultYear().toString(),
+      10
+    );
+
+    submittedFnr = fnr;
+    submittedYear = inntektsaar;
+    hasSearched = true;
+
+    const parseResult = RequestSchema.safeParse({ fnr, inntektsaar });
+
+    if (!parseResult.success) {
+      const fnrError = parseResult.error.errors.find(
+        (e) => e.path[0] === "fnr"
+      );
+      fnrValidationError = fnrError?.message ?? "Ugyldig forespørsel";
+    } else {
+      const token = Astro.locals.token;
+      const result = await getSkattekort({ fnr, inntektsaar }, token);
+      searchData = result.data;
+      searchError = result.error;
+    }
+  } catch (error) {
+    searchError = "Noe gikk galt ved behandling av forespørselen";
+  }
+}
 ---
 
 <Layout>
   <div class={styles.page}>
-    <Form client:load />
+    <SearchForm
+      defaultFnr={submittedFnr}
+      defaultYear={submittedYear}
+      fnrError={fnrValidationError}
+    />
+
+    {hasSearched && <SkattekortResults data={searchData} error={searchError} />}
   </div>
 </Layout>

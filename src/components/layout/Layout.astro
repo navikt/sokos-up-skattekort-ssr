@@ -1,6 +1,15 @@
 ---
+/**
+ * Main layout wrapper for the skattekort microfrontend.
+ *
+ * This is a minimal layout that:
+ * - Imports NAV Aksel CSS (inlined by Astro for fast rendering)
+ * - Wraps content in the scoping class for CSS isolation
+ * - Outputs pure HTML without any JavaScript
+ */
 import "@navikt/ds-css";
 ---
+
 <meta charset="utf-8" />
 <section class="sokos-up-skattekort-ssr">
   <slot />

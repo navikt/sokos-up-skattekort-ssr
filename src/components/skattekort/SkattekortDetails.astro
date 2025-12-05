@@ -1,0 +1,98 @@
+---
+import { BodyShort, Heading, Label } from "@navikt/ds-react";
+import type { Arbeidstaker } from "@schema/SkattekortSchema";
+import ForskuddstrekkList from "./ForskuddstrekkList.astro";
+
+interface Props {
+  arbeidstaker: Arbeidstaker;
+}
+
+const { arbeidstaker: at } = Astro.props;
+const { skattekort, tilleggsopplysning } = at;
+---
+
+<article class="skattekort-card">
+  <Heading level="3" size="small" spacing>
+    Skattekort for {at.arbeidstakeridentifikator}
+  </Heading>
+
+  <dl class="details-grid">
+    <dt><Label as="span">Inntektsår:</Label></dt>
+    <dd><BodyShort>{at.inntektsaar}</BodyShort></dd>
+
+    <dt><Label as="span">Resultat:</Label></dt>
+    <dd><BodyShort>{at.resultatPaaForespoersel}</BodyShort></dd>
+
+    {
+      skattekort?.utstedtDato && (
+        <>
+          <dt>
+            <Label as="span">Utstedt dato:</Label>
+          </dt>
+          <dd>
+            <BodyShort>{skattekort.utstedtDato}</BodyShort>
+          </dd>
+        </>
+      )
+    }
+
+    {
+      skattekort?.skattekortidentifikator && (
+        <>
+          <dt>
+            <Label as="span">Skattekort ID:</Label>
+          </dt>
+          <dd>
+            <BodyShort>{skattekort.skattekortidentifikator}</BodyShort>
+          </dd>
+        </>
+      )
+    }
+
+    {
+      skattekort?.forskuddstrekk && skattekort.forskuddstrekk.length > 0 && (
+        <>
+          <dt>
+            <Label as="span">Forskuddstrekk:</Label>
+          </dt>
+          <dd>
+            <ForskuddstrekkList forskuddstrekk={skattekort.forskuddstrekk} />
+          </dd>
+        </>
+      )
+    }
+
+    {
+      tilleggsopplysning && tilleggsopplysning.length > 0 && (
+        <>
+          <dt>
+            <Label as="span">Tilleggsopplysninger:</Label>
+          </dt>
+          <dd>
+            <BodyShort>{tilleggsopplysning.join(", ")}</BodyShort>
+          </dd>
+        </>
+      )
+    }
+  </dl>
+</article>
+
+<style>
+  .skattekort-card {
+    background-color: var(--a-surface-subtle);
+    padding: 1.5rem;
+    border-radius: var(--a-border-radius-medium);
+  }
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .details-grid dt,
+  .details-grid dd {
+    margin: 0;
+  }
+</style>

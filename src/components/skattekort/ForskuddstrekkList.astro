@@ -1,0 +1,55 @@
+---
+import { BodyShort } from "@navikt/ds-react";
+import type { Forskuddstrekk } from "@schema/SkattekortSchema";
+
+interface Props {
+  forskuddstrekk: Forskuddstrekk[];
+}
+
+const { forskuddstrekk } = Astro.props;
+
+function getForskuddstrekkDetails(ft: Forskuddstrekk): string {
+  switch (ft.type) {
+    case "Trekkprosent":
+      return ft.prosentsats ? `${ft.prosentsats}%` : "";
+    case "Trekktabell":
+      return ft.tabellnummer ? `Tabell ${ft.tabellnummer}` : "";
+    case "Frikort":
+      return ft.frikortbeloep ? `Frikortbeløp: ${ft.frikortbeloep}` : "";
+    default:
+      return "";
+  }
+}
+---
+
+<ul class="forskuddstrekk-list">
+  {
+    forskuddstrekk.map((ft) => {
+      const details = getForskuddstrekkDetails(ft);
+      return (
+        <li>
+          <BodyShort>
+            <strong>{ft.type}</strong> ({ft.trekkode})
+            {details && <span> - {details}</span>}
+          </BodyShort>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .forskuddstrekk-list {
+    list-style: disc;
+    padding-left: 1.25rem;
+    margin: 0;
+  }
+
+  .forskuddstrekk-list li {
+    margin-bottom: 0.25rem;
+  }
+
+  .forskuddstrekk-list li:last-child {
+    margin-bottom: 0;
+  }
+</style>

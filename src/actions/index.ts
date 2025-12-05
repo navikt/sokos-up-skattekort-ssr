@@ -1,3 +1,10 @@
+/**
+ * Astro Actions for client-side interactivity (if needed in the future).
+ *
+ * Note: The main data fetching for skattekort is now done server-side
+ * via native form submission and SSR. This file is kept for potential
+ * future use cases where client-side API calls are needed.
+ */
 import { defineAction, ActionError } from "astro:actions";
 import { RequestSchema } from "@schema/SkattekortSchema";
 import { getOboToken } from "@utils/token";

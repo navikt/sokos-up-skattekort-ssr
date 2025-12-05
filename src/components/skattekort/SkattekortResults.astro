@@ -1,0 +1,58 @@
+---
+import { Alert } from "@navikt/ds-react";
+import type { Response } from "../../types/Response";
+import SkattekortDetails from "./SkattekortDetails.astro";
+
+interface Props {
+  data: Response | null;
+  error: string | null;
+}
+
+const { data, error } = Astro.props;
+---
+
+<div class="results-container">
+  {
+    error && (
+      <Alert variant="error" className="alert">
+        {error}
+      </Alert>
+    )
+  }
+
+  {
+    data && data.length === 0 && (
+      <Alert variant="info" className="alert">
+        Ingen skattekort funnet for det valgte året.
+      </Alert>
+    )
+  }
+
+  {
+    data && data.length > 0 && (
+      <div class="results-list">
+        {data.map((arbeidstaker) => (
+          <SkattekortDetails arbeidstaker={arbeidstaker} />
+        ))}
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .results-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 2rem 2rem;
+  }
+
+  .alert {
+    margin-bottom: 1.5rem;
+  }
+
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+</style>

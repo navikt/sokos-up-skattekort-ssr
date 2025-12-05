@@ -1,0 +1,40 @@
+---
+import { getAvailableYears, getDefaultYear } from "@utils/skattekort";
+import SearchFormIsland from "./SearchFormIsland";
+
+interface Props {
+  defaultFnr?: string;
+  defaultYear?: number;
+  fnrError?: string;
+  isLoading?: boolean;
+}
+
+const {
+  defaultFnr = "",
+  defaultYear,
+  fnrError,
+  isLoading = false,
+} = Astro.props;
+
+const years = getAvailableYears();
+const selectedYear = defaultYear ?? getDefaultYear();
+---
+
+<div class="search-form-wrapper">
+  <SearchFormIsland
+    client:idle
+    defaultFnr={defaultFnr}
+    defaultYear={selectedYear}
+    years={years}
+    fnrError={fnrError}
+    isLoading={isLoading}
+  />
+</div>
+
+<style>
+  .search-form-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+</style>
