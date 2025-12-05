@@ -43,7 +43,7 @@ export default defineConfig({
             vite.build.rollupOptions["external"] = [
               "react",
               "react-dom",
-              "react/jsx-runtime",
+              "jsx-runtime",
             ];
           }
         },
