@@ -6,13 +6,13 @@ import { isLocal } from "@utils/environment";
 import logger from "@utils/logger";
 import { HttpStatusCodeError } from "../types/errors";
 
-const FormRequestSchema = z.object({
+const RequestSchema = z.object({
   fnr: z
     .string()
     .min(11, "Fødselsnummer må være 11 siffer")
     .max(11, "Fødselsnummer må være 11 siffer")
     .regex(/^\d{11}$/, "Fødselsnummer må inneholde kun tall"),
-  inntektsaar: z.coerce
+  inntektsaar: z
     .number()
     .min(2000)
     .max(new Date().getFullYear() + 1),
@@ -20,8 +20,8 @@ const FormRequestSchema = z.object({
 
 export const server = {
   hentSkattekort: defineAction({
-    accept: "form",
-    input: FormRequestSchema,
+    accept: "json",
+    input: RequestSchema,
     handler: async (input, context) => {
       const token = context.locals.token;
 
@@ -56,35 +56,33 @@ export const server = {
         }
       }
 
+      context.session?.set("lastSearch", {
+        fnr: input.fnr,
+        inntektsaar: input.inntektsaar.toString(),
+      });
+
       try {
         const data = await fetchSkattekort(input, backendToken);
-        return data;
+        context.session?.set("skattekortResult", data);
+        context.session?.set("skattekortError", undefined);
+        return { success: true };
       } catch (error) {
+        let errorMessage = "Ukjent feil";
+
         if (error instanceof HttpStatusCodeError) {
-          if (error.statusCode === 401 || error.statusCode === 403) {
-            throw new ActionError({
-              code: "UNAUTHORIZED",
-              message: error.message,
-            });
-          }
-          if (error.statusCode === 404) {
-            throw new ActionError({
-              code: "NOT_FOUND",
-              message: error.message,
-            });
-          }
-          if (error.statusCode === 400) {
-            throw new ActionError({
-              code: "BAD_REQUEST",
-              message: error.message,
-            });
-          }
+          errorMessage = error.message;
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
         }
 
         logger.error({ error }, "Error fetching skattekort");
+
+        context.session?.set("skattekortError", errorMessage);
+        context.session?.set("skattekortResult", undefined);
+
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
-          message: error instanceof Error ? error.message : "Unknown error",
+          message: errorMessage,
         });
       }
     },

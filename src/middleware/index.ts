@@ -1,5 +1,4 @@
 import { defineMiddleware } from "astro/middleware";
-import { getActionContext } from "astro:actions";
 import { isInternal, isLocal } from "../utils/environment";
 import { getToken, validateAzureToken } from "@navikt/oasis";
 import logger from "@utils/logger.ts";
@@ -25,13 +24,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
       context.locals.token = token;
     }
-  }
-
-  const { action, setActionResult, serializeActionResult } =
-    getActionContext(context);
-  if (action?.calledFrom === "form") {
-    const result = await action.handler();
-    setActionResult(action.name, serializeActionResult(result));
   }
 
   return next();

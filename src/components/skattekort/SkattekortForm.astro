@@ -1,0 +1,133 @@
+---
+import { Button, Heading, TextField, Label } from "@navikt/ds-react";
+import styles from "./Form.module.css";
+
+interface Props {
+  years: number[];
+  defaultYear: string;
+  submittedFnr?: string;
+}
+
+const { years, defaultYear, submittedFnr = "" } = Astro.props;
+---
+
+<form id="skattekort-form" class={styles.form}>
+  <Heading level="2" size="medium" spacing>Søk etter skattekort</Heading>
+
+  <TextField
+    label="Fødselsnummer (11 siffer)"
+    name="fnr"
+    id="fnr-input"
+    defaultValue={submittedFnr}
+    autoComplete="off"
+    maxLength={11}
+    className={styles.input}
+  />
+
+  <fieldset class={styles.radioGroup}>
+    <Label as="legend">Velg inntektsår</Label>
+    <div class={styles.radioButtons}>
+      {
+        years.map((year) => (
+          <label class={styles.radioLabel}>
+            <input
+              type="radio"
+              name="inntektsaar"
+              value={year.toString()}
+              checked={year.toString() === defaultYear}
+              class="navds-radio__input"
+            />
+            <span class="navds-radio__label">{year}</span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  <Button type="submit" id="submit-button" className={styles.submitButton}>
+    Søk
+  </Button>
+</form>
+
+<script>
+  import { actions } from "astro:actions";
+
+  const form = document.getElementById("skattekort-form") as HTMLFormElement;
+  const fnrInput = document.getElementById("fnr-input") as HTMLInputElement;
+  const submitButton = document.getElementById(
+    "submit-button"
+  ) as HTMLButtonElement;
+  const fnrWrapper = fnrInput?.closest(".navds-form-field") as HTMLElement;
+
+  function validateFnr(value: string): string | null {
+    if (!value) return "Fødselsnummer er påkrevd";
+    if (!/^\d*$/.test(value)) return "Fødselsnummer må inneholde kun tall";
+    if (value.length !== 11) return "Fødselsnummer må være 11 siffer";
+    return null;
+  }
+
+  function setError(message: string | null) {
+    const existingError = fnrWrapper?.querySelector(".navds-error-message");
+    existingError?.remove();
+
+    if (message) {
+      fnrInput?.classList.add("navds-text-field__input--error");
+      fnrWrapper?.classList.add("navds-text-field--error");
+
+      const errorDiv = document.createElement("div");
+      errorDiv.className = "navds-error-message navds-label";
+      errorDiv.textContent = message;
+      fnrWrapper?.appendChild(errorDiv);
+    } else {
+      fnrInput?.classList.remove("navds-text-field__input--error");
+      fnrWrapper?.classList.remove("navds-text-field--error");
+    }
+  }
+
+  fnrInput?.addEventListener("input", () => {
+    const value = fnrInput.value;
+
+    if (value.length > 0) {
+      if (!/^\d*$/.test(value)) {
+        setError("Fødselsnummer må inneholde kun tall");
+      } else if (value.length === 11) {
+        setError(null);
+      } else if (value.length > 0) {
+        setError(`Fødselsnummer må være 11 siffer (${value.length}/11)`);
+      }
+    } else {
+      setError(null);
+    }
+  });
+
+  fnrInput?.addEventListener("focus", () => {
+    if (!fnrInput.value) setError(null);
+  });
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const fnr = fnrInput?.value ?? "";
+    const error = validateFnr(fnr);
+
+    if (error) {
+      setError(error);
+      fnrInput?.focus();
+      return;
+    }
+
+    setError(null);
+
+    const formData = new FormData(form);
+    const inntektsaar = Number(formData.get("inntektsaar"));
+
+    submitButton.setAttribute("aria-busy", "true");
+    submitButton.disabled = true;
+
+    try {
+      await actions.hentSkattekort({ fnr, inntektsaar });
+    } finally {
+      window.location.reload();
+    }
+  });
+</script>

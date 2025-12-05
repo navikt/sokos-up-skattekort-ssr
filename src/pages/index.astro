@@ -1,9 +1,8 @@
 ---
 import Layout from "@components/layout/Layout.astro";
-import ClientForm from "@components/skattekort/ClientForm";
+import SkattekortForm from "@components/skattekort/SkattekortForm.astro";
 import Results from "@components/skattekort/Results.astro";
 import { Alert } from "@navikt/ds-react";
-import { actions } from "astro:actions";
 import styles from "./_index.module.css";
 
 const now = new Date();
@@ -13,38 +12,29 @@ const years = isAfterDec15
   ? [currentYear, currentYear + 1]
   : [currentYear - 1, currentYear];
 
-const result = Astro.getActionResult(actions.hentSkattekort);
-
-let submittedFnr = "";
-let submittedYear = years[1].toString();
-
-if (Astro.request.method === "POST") {
-  const formData = await Astro.request.clone().formData();
-  submittedFnr = formData.get("fnr")?.toString() ?? "";
-  submittedYear = formData.get("inntektsaar")?.toString() ?? submittedYear;
-}
+const result = await Astro.session?.get("skattekortResult");
+const error = await Astro.session?.get("skattekortError");
+const lastSearch = await Astro.session?.get("lastSearch");
 ---
 
 <Layout>
   <div class={styles.page}>
     <div class={styles.container}>
-      <ClientForm
-        client:load
+      <SkattekortForm
         years={years}
-        defaultYear={submittedYear}
-        submittedFnr={submittedFnr}
-        actionUrl={actions.hentSkattekort.queryString}
+        defaultYear={lastSearch?.inntektsaar ?? years[1].toString()}
+        submittedFnr={lastSearch?.fnr ?? ""}
       />
 
       {
-        result?.error && (
+        error && (
           <Alert variant="error" className={styles.alert}>
-            {result.error.message}
+            {error}
           </Alert>
         )
       }
 
-      {result?.data && <Results data={result.data} />}
+      {result && <Results data={result} />}
     </div>
   </div>
 </Layout>
