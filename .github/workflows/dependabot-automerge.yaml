@@ -15,3 +15,5 @@ jobs:
     name: Dependabot Auto-merge
     uses: navikt/mob-gha-workflows/.github/workflows/dependabot-automerge.yaml@main
     secrets: inherit
+    with:
+      ignored-dependencies: "react,react-dom"
