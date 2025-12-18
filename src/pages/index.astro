@@ -2,6 +2,13 @@
 import Layout from "@components/layout/Layout.astro";
 import Form from "@components/skattekort/Form";
 import styles from "./_index.module.css";
+import logger from "@utils/logger";
+
+const startTime = performance.now();
+logger.info({ path: Astro.url.pathname }, "Page render started");
+
+const renderTime = performance.now() - startTime;
+logger.info({ path: Astro.url.pathname, renderTime }, "Page render completed");
 ---
 
 <Layout>
