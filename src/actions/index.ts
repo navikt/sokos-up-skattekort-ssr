@@ -33,7 +33,10 @@ export const server = {
         }
 
         try {
+          const oboStart = performance.now();
           backendToken = await getOboToken(token, audience);
+          const oboDuration = performance.now() - oboStart;
+          logger.info({ oboDuration }, "OBO token exchange completed");
         } catch (e) {
           logger.error({ error: e }, "OBO token exchange failed");
           throw new ActionError({

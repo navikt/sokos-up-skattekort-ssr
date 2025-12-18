@@ -18,10 +18,12 @@ export async function fetchSkattekort(
     );
   }
   const url = `${API_URL}/api/v1/hent-skattekort`;
+  const startTime = performance.now();
 
-  logger.info(`Fetching skattekort from: ${url}`);
+  logger.info({ url, query }, "Backend request started");
 
   try {
+    const fetchStart = performance.now();
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -32,6 +34,12 @@ export async function fetchSkattekort(
       },
       body: JSON.stringify(query),
     });
+
+    const fetchDuration = performance.now() - fetchStart;
+    logger.info(
+      { url, fetchDuration, status: response.status },
+      "Backend response received",
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -76,11 +84,13 @@ export async function fetchSkattekort(
     }
 
     const data = await response.json();
+    const totalDuration = performance.now() - startTime;
 
-    console.log("API Response:", JSON.stringify(data, null, 2));
+    logger.info({ url, totalDuration }, "Backend request completed");
 
     return data as Response;
   } catch (error) {
+    const totalDuration = performance.now() - startTime;
     logger.error(
       {
         error,
