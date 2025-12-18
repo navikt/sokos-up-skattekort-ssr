@@ -10,19 +10,19 @@ spec:
   port: 3000
   liveness:
     path: /api/internal/isAlive
-    initialDelaySeconds: 10
+    initialDelay: 10
     timeout: 3
     periodSeconds: 10
     failureThreshold: 3
   readiness:
     path: /api/internal/isReady
-    initialDelaySeconds: 10
+    initialDelay: 10
     timeout: 3
     periodSeconds: 10
     failureThreshold: 3
   startup:
     path: /api/internal/isAlive
-    initialDelaySeconds: 5
+    initialDelay: 5
     periodSeconds: 5
     failureThreshold: 30
   replicas:
