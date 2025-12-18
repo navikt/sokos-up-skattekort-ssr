@@ -96,6 +96,7 @@ export async function fetchSkattekort(
         error,
         message: error instanceof Error ? error.message : "Unknown error",
         url,
+        totalDuration,
       },
       "Failed to fetch skattekort",
     );
