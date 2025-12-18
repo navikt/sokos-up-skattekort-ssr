@@ -10,13 +10,25 @@ spec:
   port: 3000
   liveness:
     path: /api/internal/isAlive
-    initialDelay: 10
+    initialDelaySeconds: 10
+    timeout: 3
+    periodSeconds: 10
+    failureThreshold: 3
   readiness:
     path: /api/internal/isReady
-    initialDelay: 10
+    initialDelaySeconds: 10
+    timeout: 3
+    periodSeconds: 10
+    failureThreshold: 3
+  startup:
+    path: /api/internal/isAlive
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    failureThreshold: 30
   replicas:
     min: 2
     max: 4
+    cpuThresholdPercentage: 80
   observability:
     autoInstrumentation:
       enabled: true
@@ -42,8 +54,8 @@ spec:
     limits:
       memory: 1024Mi
     requests:
-      cpu: 50m
-      memory: 128Mi
+      cpu: 500m
+      memory: 512Mi
   env:
     - name: SOKOS_SKATTEKORT_API
       value: http://sokos-skattekort
