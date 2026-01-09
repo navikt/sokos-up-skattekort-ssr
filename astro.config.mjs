@@ -2,8 +2,6 @@ import node from "@astrojs/node";
 import react from "@astrojs/react";
 import { defineConfig } from "astro/config";
 import prefixer from "postcss-prefix-selector";
-import { rollupImportMapPlugin } from "rollup-plugin-import-map";
-import importmap from "./importmap.json";
 
 // https://astro.build/config
 export default defineConfig({
