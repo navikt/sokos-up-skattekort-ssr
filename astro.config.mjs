@@ -26,15 +26,15 @@ export default defineConfig({
   integrations: [
     react(),
     {
-      name: "importmap",
+      name: "importmap-externals",
       hooks: {
         "astro:build:setup": ({ vite, target }) => {
           if (target === "client") {
-            vite.plugins.push({
-              ...rollupImportMapPlugin(importmap),
-              enforce: "pre",
-              apply: "build",
-            });
+            vite.build.rollupOptions.external = [
+              "react",
+              "react-dom",
+              "jsx-runtime",
+            ];
           }
         },
       },
