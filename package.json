@@ -1,56 +1,60 @@
 {
-  "name": "sokos-up-skattekort-ssr",
-  "type": "module",
-  "version": "1.0.0",
-  "scripts": {
-    "astro": "astro",
-    "dev": "astro dev",
-    "dev:mock": "concurrently \"pnpm run mock\" \"pnpm run dev\"",
-    "build": "astro check && astro build",
-    "mock": "tsx mock/server.ts",
-    "preview": "astro preview",
-    "stylelint": "stylelint '**/*.css'",
-    "prepare": "husky"
-  },
-  "dependencies": {
-    "@astrojs/check": "^0.9.6",
-    "@astrojs/node": "^9.5.1",
-    "@astrojs/react": "^4.4.2",
-    "@navikt/aksel-icons": "7.36.0",
-    "@navikt/ds-css": "7.36.0",
-    "@navikt/ds-react": "7.36.0",
-    "@navikt/oasis": "^4.1.1",
-    "astro": "^5.16.6",
-    "pino-http": "^11.0.0",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "zod": "^4.2.1"
-  },
-  "devDependencies": {
-    "@hono/node-server": "1.19.7",
-    "@navikt/aksel-stylelint": "^7.36.0",
-    "@types/node": "25.0.3",
-    "@types/react": "19.2.7",
-    "@types/react-dom": "19.2.3",
-    "concurrently": "^9.2.1",
-    "hono": "4.11.3",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.2.7",
-    "postcss": "^8.5.6",
-    "postcss-prefix-selector": "^2.1.1",
-    "prettier": "3.7.4",
-    "prettier-plugin-astro": "^0.14.1",
-    "stylelint": "^16.26.1",
-    "stylelint-config-standard": "^39.0.1",
-    "tsx": "4.21.0",
-    "typescript": "5.9.3"
-  },
-  "lint-staged": {
-    "*.css": "stylelint --fix",
-    "*": "prettier --write --ignore-unknown"
-  },
-  "engines": {
-    "pnpm": ">=10.16.0",
-    "node": ">=22.21.0"
-  }
+	"name": "sokos-up-skattekort-ssr",
+	"type": "module",
+	"version": "1.0.0",
+	"scripts": {
+		"astro": "astro",
+		"dev": "astro dev",
+		"dev:mock": "concurrently \"pnpm dev\" \"tsx mock/server.ts\"",
+		"build": "astro check && astro build",
+		"biome:check": "biome check --files-ignore-unknown=true",
+		"biome:fix": "biome check --write --no-errors-on-unmatched",
+		"prettier:format": "prettier --write '**/*.astro'",
+		"stylelint:check": "stylelint '**/*.css'",
+		"stylelint:fix": "stylelint '**/*.css' --fix",
+		"prepare": "husky"
+	},
+	"dependencies": {
+		"@astrojs/check": "^0.9.6",
+		"@astrojs/node": "^9.5.1",
+		"@astrojs/react": "^4.4.2",
+		"@navikt/aksel-icons": "7.36.0",
+		"@navikt/ds-css": "7.36.0",
+		"@navikt/ds-react": "7.36.0",
+		"@navikt/oasis": "^4.1.1",
+		"astro": "^5.16.6",
+		"pino-http": "^11.0.0",
+		"react": "19.2.0",
+		"react-dom": "19.2.0",
+		"zod": "^4.2.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.11",
+		"@hono/node-server": "1.19.7",
+		"@navikt/aksel-stylelint": "^7.36.0",
+		"@types/node": "25.0.3",
+		"@types/react": "19.2.7",
+		"@types/react-dom": "19.2.3",
+		"concurrently": "^9.2.1",
+		"hono": "4.11.3",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.2.7",
+		"postcss": "^8.5.6",
+		"postcss-prefix-selector": "^2.1.1",
+		"prettier": "3.7.4",
+		"prettier-plugin-astro": "^0.14.1",
+		"stylelint": "^16.26.1",
+		"stylelint-config-standard": "^39.0.1",
+		"tsx": "4.21.0",
+		"typescript": "5.9.3"
+	},
+	"lint-staged": {
+		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": "biome check --write --no-errors-on-unmatched",
+		"*.astro": "prettier --write",
+		"*.css": "stylelint --fix"
+	},
+	"engines": {
+		"pnpm": ">=10.16.0",
+		"node": ">=22.21.0"
+	}
 }
