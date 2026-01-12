@@ -14,3 +14,4 @@ jobs:
       PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
     with:
       ignored-dependencies: "react,react-dom"  
+      minimum-age-of-pr: "0"
