@@ -13,10 +13,7 @@ on:
       - ".github/workflows/codeql-trivy-scan.yaml"
       - ".github/workflows/dependabot-automerge.yaml"
       - ".github/workflows/manual-deploy.yaml"
-      - ".github/workflows/playwright.yaml"
       - ".github/dependabot.yaml"
-  repository_dispatch:
-    types: [dependabot-deploy]
 
 env:
   TZ: Europe/Oslo
