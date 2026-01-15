@@ -24,8 +24,8 @@
 		"@navikt/oasis": "^4.1.1",
 		"astro": "^5.16.6",
 		"pino-http": "^11.0.0",
-		"react": "19.2.3",
-		"react-dom": "19.2.3",
+		"react": "19.1.4",
+		"react-dom": "19.1.4",
 		"zod": "^4.3.5"
 	},
 	"devDependencies": {
