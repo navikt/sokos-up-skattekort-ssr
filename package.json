@@ -24,8 +24,8 @@
 		"@navikt/oasis": "^4.1.1",
 		"astro": "^5.16.11",
 		"pino-http": "^11.0.0",
-		"react": "19.2.0",
-		"react-dom": "19.2.0",
+		"react": "19.2.3",
+		"react-dom": "19.2.3",
 		"zod": "^4.3.5"
 	},
 	"devDependencies": {
@@ -33,7 +33,7 @@
 		"@hono/node-server": "1.19.9",
 		"@navikt/aksel-stylelint": "^7.38.0",
 		"@types/node": "25.0.9",
-		"@types/react": "19.2.7",
+		"@types/react": "19.2.9",
 		"@types/react-dom": "19.2.3",
 		"concurrently": "^9.2.1",
 		"hono": "4.11.4",
