@@ -1,223 +1,222 @@
-import {
-  Alert,
-  Button,
-  Heading,
-  Loader,
-  TextField,
-  ToggleGroup,
-} from "@navikt/ds-react";
 import { actions } from "astro:actions";
+import {
+	Alert,
+	Button,
+	Heading,
+	Loader,
+	TextField,
+	ToggleGroup,
+} from "@navikt/ds-react";
 import { useState } from "react";
 import type { Response } from "../../types/Response";
 import styles from "./Form.module.css";
 
 interface SkattekortFormProps {
-  currentYear?: number;
+	currentYear?: number;
 }
 
 export default function Form({
-  currentYear = new Date().getFullYear(),
+	currentYear = new Date().getFullYear(),
 }: SkattekortFormProps) {
-  const [fnr, setFnr] = useState("");
-  const [inntektsaar, setInntektsaar] = useState(currentYear.toString());
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<Response | null>(null);
-  const [fnrError, setFnrError] = useState<string | null>(null);
+	const [fnr, setFnr] = useState("");
+	const [inntektsaar, setInntektsaar] = useState(currentYear.toString());
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [data, setData] = useState<Response | null>(null);
+	const [fnrError, setFnrError] = useState<string | null>(null);
 
-  const getYears = () => {
-    const now = new Date();
-    const isAfterDec15 = now.getMonth() === 11 && now.getDate() >= 15;
+	const getYears = () => {
+		const now = new Date();
+		const isAfterDec15 = now.getMonth() === 11 && now.getDate() >= 15;
 
-    if (isAfterDec15) {
-      return [currentYear, currentYear + 1];
-    }
-    return [currentYear - 1, currentYear];
-  };
+		if (isAfterDec15) {
+			return [currentYear, currentYear + 1];
+		}
+		return [currentYear - 1, currentYear];
+	};
 
-  const years = getYears();
+	const years = getYears();
 
-  const validateFnr = (value: string): string | null => {
-    if (!value) {
-      return "Fødselsnummer er påkrevd";
-    }
-    if (value.length !== 11) {
-      return "Fødselsnummer må være 11 siffer";
-    }
-    if (!/^\d{11}$/.test(value)) {
-      return "Fødselsnummer må inneholde kun tall";
-    }
-    return null;
-  };
+	const validateFnr = (value: string): string | null => {
+		if (!value) {
+			return "Fødselsnummer er påkrevd";
+		}
+		if (value.length !== 11) {
+			return "Fødselsnummer må være 11 siffer";
+		}
+		if (!/^\d{11}$/.test(value)) {
+			return "Fødselsnummer må inneholde kun tall";
+		}
+		return null;
+	};
 
-  const handleFnrChange = (value: string) => {
-    setFnr(value);
-    setFnrError(null);
-    setError(null);
-  };
+	const handleFnrChange = (value: string) => {
+		setFnr(value);
+		setFnrError(null);
+		setError(null);
+	};
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setData(null);
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setError(null);
+		setData(null);
 
-    const validationError = validateFnr(fnr);
-    if (validationError) {
-      setFnrError(validationError);
-      return;
-    }
+		const validationError = validateFnr(fnr);
+		if (validationError) {
+			setFnrError(validationError);
+			return;
+		}
 
-    setLoading(true);
+		setLoading(true);
 
-    try {
-      const { data, error } = await actions.hentSkattekort({
-        fnr,
-        inntektsaar: parseInt(inntektsaar),
-      });
+		try {
+			const { data, error } = await actions.hentSkattekort({
+				fnr,
+				inntektsaar: parseInt(inntektsaar, 10),
+			});
 
-      if (error) {
-        throw new Error(
-          error.message || "Noe gikk galt ved henting av skattekort",
-        );
-      }
+			if (error) {
+				throw new Error(
+					error.message || "Noe gikk galt ved henting av skattekort",
+				);
+			}
 
-      setData(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Noe gikk galt");
-    } finally {
-      setLoading(false);
-    }
-  };
+			setData(data);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Noe gikk galt");
+		} finally {
+			setLoading(false);
+		}
+	};
 
-  return (
-    <div className={styles.container}>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <Heading level="2" size="medium" spacing>
-          Søk etter skattekort
-        </Heading>
+	return (
+		<div className={styles.container}>
+			<form onSubmit={handleSubmit} className={styles.form}>
+				<Heading level="2" size="medium" spacing>
+					Søk etter skattekort
+				</Heading>
 
-        <TextField
-          label="Fødselsnummer (11 siffer)"
-          value={fnr}
-          onChange={(e) => handleFnrChange(e.target.value)}
-          error={fnrError}
-          autoComplete="off"
-          maxLength={11}
-          className={styles.input}
-        />
+				<TextField
+					label="Fødselsnummer (11 siffer)"
+					value={fnr}
+					onChange={(e) => handleFnrChange(e.target.value)}
+					error={fnrError}
+					autoComplete="off"
+					maxLength={11}
+					className={styles.input}
+				/>
 
-        <ToggleGroup
-          label="Velg inntektsår"
-          value={inntektsaar}
-          onChange={(value) => setInntektsaar(value)}
-          size="small"
-        >
-          {years.map((year) => (
-            <ToggleGroup.Item key={year} value={year.toString()}>
-              {year}
-            </ToggleGroup.Item>
-          ))}
-        </ToggleGroup>
+				<ToggleGroup
+					label="Velg inntektsår"
+					value={inntektsaar}
+					onChange={(value) => setInntektsaar(value)}
+					size="small"
+				>
+					{years.map((year) => (
+						<ToggleGroup.Item key={year} value={year.toString()}>
+							{year}
+						</ToggleGroup.Item>
+					))}
+				</ToggleGroup>
 
-        <Button
-          type="submit"
-          disabled={loading}
-          className={styles.submitButton}
-        >
-          {loading ? <Loader size="small" /> : "Søk"}
-        </Button>
-      </form>
+				<Button
+					type="submit"
+					variant="primary"
+					data-color="accent"
+					disabled={loading}
+					className={styles.submitButton}
+				>
+					{loading ? <Loader size="small" /> : "Søk"}
+				</Button>
+			</form>
 
-      {error && (
-        <Alert variant="error" className={styles.alert}>
-          {error}
-        </Alert>
-      )}
+			{error && (
+				<Alert variant="error" className={styles.alert}>
+					{error}
+				</Alert>
+			)}
 
-      {data && data.length === 0 && (
-        <Alert variant="info" className={styles.alert}>
-          Ingen skattekort funnet for det valgte året.
-        </Alert>
-      )}
+			{data && data.length === 0 && (
+				<Alert variant="info" className={styles.alert}>
+					Ingen skattekort funnet for det valgte året.
+				</Alert>
+			)}
 
-      {data &&
-        data.map((at, index) => (
-          <div key={index} className={styles.result}>
-            <Heading level="3" size="small" spacing>
-              Skattekort for {at.arbeidstakeridentifikator}
-            </Heading>
+			{data?.map((at) => (
+				<div
+					key={`${at.arbeidstakeridentifikator}-${at.inntektsaar}`}
+					className={styles.result}
+				>
+					<Heading level="3" size="small" spacing>
+						Skattekort for {at.arbeidstakeridentifikator}
+					</Heading>
 
-            <div className={styles.arbeidstaker}>
-              <dl className={styles.details}>
-                <dt>Inntektsår:</dt>
-                <dd>{at.inntektsaar}</dd>
+					<div className={styles.arbeidstaker}>
+						<dl className={styles.details}>
+							<dt>Inntektsår:</dt>
+							<dd>{at.inntektsaar}</dd>
 
-                <dt>Resultat:</dt>
-                <dd>{at.resultatPaaForespoersel}</dd>
+							<dt>Resultat:</dt>
+							<dd>{at.resultatPaaForespoersel}</dd>
 
-                {at.skattekort && (
-                  <>
-                    {at.skattekort.utstedtDato && (
-                      <>
-                        <dt>Utstedt dato:</dt>
-                        <dd>{at.skattekort.utstedtDato}</dd>
-                      </>
-                    )}
+							{at.skattekort && (
+								<>
+									{at.skattekort.utstedtDato && (
+										<>
+											<dt>Utstedt dato:</dt>
+											<dd>{at.skattekort.utstedtDato}</dd>
+										</>
+									)}
 
-                    {at.skattekort.skattekortidentifikator && (
-                      <>
-                        <dt>Skattekort ID:</dt>
-                        <dd>{at.skattekort.skattekortidentifikator}</dd>
-                      </>
-                    )}
+									{at.skattekort.skattekortidentifikator && (
+										<>
+											<dt>Skattekort ID:</dt>
+											<dd>{at.skattekort.skattekortidentifikator}</dd>
+										</>
+									)}
 
-                    {at.skattekort.forskuddstrekk &&
-                      at.skattekort.forskuddstrekk.length > 0 && (
-                        <>
-                          <dt>Forskuddstrekk:</dt>
-                          <dd>
-                            <ul className={styles.forskuddstrekkList}>
-                              {at.skattekort.forskuddstrekk.map(
-                                (ft, ftIndex) => (
-                                  <li
-                                    key={`${ft.trekkode}-${ft.type}-${ftIndex}`}
-                                  >
-                                    <strong>{ft.type}</strong> ({ft.trekkode})
-                                    {ft.type === "Trekkprosent" &&
-                                      ft.prosentsats && (
-                                        <span> - {ft.prosentsats}%</span>
-                                      )}
-                                    {ft.type === "Trekktabell" &&
-                                      ft.tabellnummer && (
-                                        <span> - Tabell {ft.tabellnummer}</span>
-                                      )}
-                                    {ft.type === "Frikort" &&
-                                      ft.frikortbeloep && (
-                                        <span>
-                                          {" "}
-                                          - Frikortbeløp: {ft.frikortbeloep}
-                                        </span>
-                                      )}
-                                  </li>
-                                ),
-                              )}
-                            </ul>
-                          </dd>
-                        </>
-                      )}
-                  </>
-                )}
+									{at.skattekort.forskuddstrekk &&
+										at.skattekort.forskuddstrekk.length > 0 && (
+											<>
+												<dt>Forskuddstrekk:</dt>
+												<dd>
+													<ul className={styles.forskuddstrekkList}>
+														{at.skattekort.forskuddstrekk.map((ft, ftIndex) => (
+															<li key={`${ft.trekkode}-${ft.type}-${ftIndex}`}>
+																<strong>{ft.type}</strong> ({ft.trekkode})
+																{ft.type === "Trekkprosent" &&
+																	ft.prosentsats && (
+																		<span> - {ft.prosentsats}%</span>
+																	)}
+																{ft.type === "Trekktabell" &&
+																	ft.tabellnummer && (
+																		<span> - Tabell {ft.tabellnummer}</span>
+																	)}
+																{ft.type === "Frikort" && ft.frikortbeloep && (
+																	<span>
+																		{" "}
+																		- Frikortbeløp: {ft.frikortbeloep}
+																	</span>
+																)}
+															</li>
+														))}
+													</ul>
+												</dd>
+											</>
+										)}
+								</>
+							)}
 
-                {at.tilleggsopplysning && at.tilleggsopplysning.length > 0 && (
-                  <>
-                    <dt>Tilleggsopplysninger:</dt>
-                    <dd>{at.tilleggsopplysning.join(", ")}</dd>
-                  </>
-                )}
-              </dl>
-            </div>
-          </div>
-        ))}
-    </div>
-  );
+							{at.tilleggsopplysning && at.tilleggsopplysning.length > 0 && (
+								<>
+									<dt>Tilleggsopplysninger:</dt>
+									<dd>{at.tilleggsopplysning.join(", ")}</dd>
+								</>
+							)}
+						</dl>
+					</div>
+				</div>
+			))}
+		</div>
+	);
 }
