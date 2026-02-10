@@ -99,7 +99,7 @@ export default function Form({
 
 	return (
 		<div className={styles.container}>
-			<Heading level="2" size="medium" spacing>
+			<Heading level="1" size="large" spacing>
 				Skattekort
 			</Heading>
 			<div className={styles.box}>
