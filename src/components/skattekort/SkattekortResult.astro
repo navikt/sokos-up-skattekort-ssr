@@ -1,0 +1,81 @@
+---
+import { Heading } from "@navikt/ds-react";
+import type { Arbeidstaker } from "../../types/schema/SkattekortSchema";
+import styles from "./SkattekortResult.module.css";
+
+interface Props {
+  arbeidstaker: Arbeidstaker;
+}
+
+const { arbeidstaker: at } = Astro.props;
+---
+
+<div class={styles.result}>
+  <Heading level="3" size="small" spacing>
+    Skattekort for {at.arbeidstakeridentifikator}
+  </Heading>
+
+  <div class={styles.arbeidstaker}>
+    <dl class={styles.details}>
+      <dt>Inntektsår:</dt>
+      <dd>{at.inntektsaar}</dd>
+
+      <dt>Resultat:</dt>
+      <dd>{at.resultatPaaForespoersel}</dd>
+
+      {
+        at.skattekort?.utstedtDato && (
+          <>
+            <dt>Utstedt dato:</dt>
+            <dd>{at.skattekort.utstedtDato}</dd>
+          </>
+        )
+      }
+
+      {
+        at.skattekort?.skattekortidentifikator && (
+          <>
+            <dt>Skattekort ID:</dt>
+            <dd>{at.skattekort.skattekortidentifikator}</dd>
+          </>
+        )
+      }
+
+      {
+        at.skattekort?.forskuddstrekk &&
+          at.skattekort.forskuddstrekk.length > 0 && (
+            <>
+              <dt>Forskuddstrekk:</dt>
+              <dd>
+                <ul class={styles.forskuddstrekkList}>
+                  {at.skattekort.forskuddstrekk.map((ft) => (
+                    <li>
+                      <strong>{ft.type}</strong> ({ft.trekkode})
+                      {ft.type === "Trekkprosent" && ft.prosentsats && (
+                        <span> - {ft.prosentsats}%</span>
+                      )}
+                      {ft.type === "Trekktabell" && ft.tabellnummer && (
+                        <span> - Tabell {ft.tabellnummer}</span>
+                      )}
+                      {ft.type === "Frikort" && ft.frikortbeloep && (
+                        <span> - Frikortbeløp: {ft.frikortbeloep}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </>
+          )
+      }
+
+      {
+        at.tilleggsopplysning && at.tilleggsopplysning.length > 0 && (
+          <>
+            <dt>Tilleggsopplysninger:</dt>
+            <dd>{at.tilleggsopplysning.join(", ")}</dd>
+          </>
+        )
+      }
+    </dl>
+  </div>
+</div>

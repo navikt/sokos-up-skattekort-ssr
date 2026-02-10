@@ -1,11 +1,46 @@
 ---
+import { actions } from "astro:actions";
+import { Alert, Heading } from "@navikt/ds-react";
 import Layout from "@components/layout/Layout.astro";
-import Form from "@components/skattekort/Form";
+import SearchForm from "@components/skattekort/SearchForm";
+import SkattekortResult from "@components/skattekort/SkattekortResult.astro";
 import styles from "./_index.module.css";
+
+const result = Astro.getActionResult(actions.hentSkattekort);
+const data = result && !result.error ? result.data : null;
+const actionError = result?.error;
 ---
 
 <Layout>
   <div class={styles.page}>
-    <Form client:load />
+    <Heading level="1" size="large" spacing>Skattekort</Heading>
+
+    <form method="POST" action={actions.hentSkattekort} class={styles.form}>
+      <SearchForm
+        client:load
+        currentYear={new Date().getFullYear()}
+        previousFnr={data?.fnr}
+        previousYear={data?.inntektsaar}
+        hasResults={!!data}
+      />
+    </form>
+
+    {
+      actionError && (
+        <Alert variant="error" className={styles.alert}>
+          {actionError.message || "Noe gikk galt ved henting av skattekort"}
+        </Alert>
+      )
+    }
+
+    {
+      data && data.arbeidstakere.length === 0 && (
+        <Alert variant="info" className={styles.alert}>
+          Ingen skattekort funnet for det valgte året.
+        </Alert>
+      )
+    }
+
+    {data?.arbeidstakere.map((at) => <SkattekortResult arbeidstaker={at} />)}
   </div>
 </Layout>

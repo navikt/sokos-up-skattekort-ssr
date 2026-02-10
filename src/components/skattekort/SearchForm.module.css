@@ -1,0 +1,49 @@
+.box {
+  width: 100%;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  background-color: var(--a-surface-alt-1-subtle);
+  position: relative;
+}
+
+.helptext {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.fieldsLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.fieldsRight {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-top: 10rem;
+}
+
+.input {
+  width: 12rem;
+}
+
+@media (width <= 640px) {
+  .fields {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .fieldsRight {
+    margin-top: 0;
+    justify-content: flex-end;
+  }
+}
