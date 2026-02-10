@@ -1,10 +1,10 @@
 import { actions } from "astro:actions";
+import { EraserIcon, MagnifyingGlassIcon } from "@navikt/aksel-icons";
 import {
 	Alert,
 	Button,
 	Heading,
 	HelpText,
-	Loader,
 	TextField,
 	ToggleGroup,
 } from "@navikt/ds-react";
@@ -140,13 +140,21 @@ export default function Form({
 						<Button
 							type="button"
 							size="small"
+							icon={<EraserIcon />}
+							iconPosition="right"
 							variant="secondary"
 							onClick={handleReset}
 						>
 							Nullstill
 						</Button>
-						<Button type="submit" size="small" disabled={loading}>
-							{loading ? <Loader size="small" /> : "Søk"}
+						<Button
+							type="submit"
+							size="small"
+							icon={<MagnifyingGlassIcon />}
+							iconPosition="right"
+							loading={loading}
+						>
+							Søk
 						</Button>
 					</div>
 				</form>
