@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: "0 8 * * MON-FRI"
 
+env:
+  TZ: Europe/Oslo
+
 jobs:
   dependabot-automerge:
     permissions:
@@ -16,4 +19,4 @@ jobs:
       APP_ID: ${{ vars.APP_ID }}
       PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
     with:
-      ignored-dependencies: "react,react-dom"  
+      ignored-dependencies: "react,react-dom"
