@@ -37,7 +37,7 @@
 		"@types/react-dom": "19.2.3",
 		"baseline-browser-mapping": "^2.10.10",
 		"concurrently": "^9.2.1",
-		"hono": "4.12.8",
+		"hono": "4.12.9",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.4.0",
 		"postcss": "^8.5.8",
